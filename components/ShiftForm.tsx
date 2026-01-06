@@ -25,7 +25,7 @@ export default function ShiftForm({
     >
       <h2 className="text-lg font-semibold">Legg til vakt</h2>
 
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <label className="space-y-1">
           <div className="text-sm opacity-80">Dato</div>
           <input
@@ -34,20 +34,6 @@ export default function ShiftForm({
             onChange={(e) => setDate(e.target.value)}
             className="w-full rounded-xl border px-3 py-2"
             required
-          />
-        </label>
-
-        <label className="space-y-1">
-          <div className="text-sm opacity-80">Pause (min)</div>
-          <input
-            type="number"
-            min={0}
-            value={breakMinutes}
-            onChange={(e) => {
-              const val = Number(e.target.value);
-              setBreakMinutes(isNaN(val) || val < 0 ? 0 : val);
-            }}
-            className="w-full rounded-xl border px-3 py-2"
           />
         </label>
 
@@ -70,6 +56,20 @@ export default function ShiftForm({
             onChange={(e) => setEndTime(e.target.value)}
             className="w-full rounded-xl border px-3 py-2"
             required
+          />
+        </label>
+
+        <label className="space-y-1">
+          <div className="text-sm opacity-80">Pause (min)</div>
+          <input
+            type="number"
+            min={0}
+            value={breakMinutes}
+            onChange={(e) => {
+              const val = Number(e.target.value);
+              setBreakMinutes(isNaN(val) || val < 0 ? 0 : val);
+            }}
+            className="w-full rounded-xl border px-3 py-2"
           />
         </label>
       </div>

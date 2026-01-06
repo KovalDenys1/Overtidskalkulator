@@ -82,12 +82,12 @@ export default function ProModal({ isOpen, onClose, shifts, settings, result }: 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onClose}>
       <div className="rounded-2xl border bg-white p-6 shadow-lg max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
-        <h2 className="text-lg font-semibold mb-4">Pro</h2>
+        <h2 className="text-lg font-semibold mb-2">Pro</h2>
+        <p className="text-sm opacity-80 mb-4">
+          PDF- og CSV-rapporter er Pro-funksjoner som lanseres snart.
+        </p>
         <p className="text-sm opacity-80 mb-2">
           Last ned PDF/CSV-rapport og lagre historikk uten begrensning.
-        </p>
-        <p className="text-xs opacity-60 mb-4">
-          PDF/CSV er Pro-funksjoner. Denne MVP-en samler interesse før lansering av betaling.
         </p>
         <div className="text-lg font-semibold mb-6">{PRO_PRICE} NOK</div>
         {submitted ? (
@@ -96,10 +96,10 @@ export default function ProModal({ isOpen, onClose, shifts, settings, result }: 
               <div className="font-semibold text-green-800">Takk!</div>
             </div>
             <div className="text-xs opacity-70 text-center">
-              E-post lagres lokalt på denne enheten (MVP).
+              Du får ikke tilgang til PDF/CSV i denne versjonen.
             </div>
             <div className="text-xs opacity-70 text-center">
-              Du får ikke tilgang til nedlasting i denne versjonen.
+              E-post lagres lokalt på denne enheten (MVP).
             </div>
             <button
               onClick={() => {
@@ -141,6 +141,9 @@ export default function ProModal({ isOpen, onClose, shifts, settings, result }: 
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-3 mb-4">
+            <p className="text-xs opacity-70 mb-2">
+              I denne versjonen samler vi kun interesse. Nedlasting er ikke tilgjengelig ennå.
+            </p>
             <input
               type="email"
               value={email}
@@ -166,32 +169,34 @@ export default function ProModal({ isOpen, onClose, shifts, settings, result }: 
             Lukk
           </button>
         </div>
-        <div className="mt-4 pt-4 border-t space-y-3">
-          <div className="text-xs opacity-50 text-center">
-            Debug (lokalt): modal={metrics.pro_modal_open_count} send={metrics.pro_send_count}{" "}
-            pdf={metrics.export_pdf_click_count} csv={metrics.export_csv_click_count}
+        {process.env.NODE_ENV === "development" && (
+          <div className="mt-4 pt-4 border-t space-y-3">
+            <div className="text-xs opacity-50 text-center">
+              Debug (lokalt): modal={metrics.pro_modal_open_count} send={metrics.pro_send_count}{" "}
+              pdf={metrics.export_pdf_click_count} csv={metrics.export_csv_click_count}
+            </div>
+            <div>
+              <button
+                className="text-xs opacity-50 hover:opacity-100"
+                onClick={() => setShowTestLink(!showTestLink)}
+                type="button"
+              >
+                {showTestLink ? "Skjul" : "Test"} test-lenke
+              </button>
+              {showTestLink && (
+                <div className="mt-2">
+                  <button
+                    className="text-xs underline opacity-70 hover:opacity-100"
+                    onClick={handleTestPro}
+                    type="button"
+                  >
+                    Jeg har allerede Pro (test)
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
-          <div>
-            <button
-              className="text-xs opacity-50 hover:opacity-100"
-              onClick={() => setShowTestLink(!showTestLink)}
-              type="button"
-            >
-              {showTestLink ? "Skjul" : "Test"} test-lenke
-            </button>
-            {showTestLink && (
-              <div className="mt-2">
-                <button
-                  className="text-xs underline opacity-70 hover:opacity-100"
-                  onClick={handleTestPro}
-                  type="button"
-                >
-                  Jeg har allerede Pro (test)
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );

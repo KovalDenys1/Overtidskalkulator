@@ -63,14 +63,14 @@ export default function SummaryCard({
             onClick={handlePDFClick}
             type="button"
           >
-            PDF-rapport (Pro)
+            PDF-rapport (Pro – kommer snart)
           </button>
           <button
             className="w-full rounded-xl border px-3 py-2 font-medium hover:bg-black/5 text-sm"
             onClick={handleCSVClick}
             type="button"
           >
-            CSV-rapport (Pro)
+            CSV-rapport (Pro – kommer snart)
           </button>
         </div>
       </div>
