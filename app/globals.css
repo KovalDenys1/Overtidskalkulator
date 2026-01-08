@@ -10,6 +10,19 @@ body {
   font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Liberation Sans", sans-serif;
 }
 
+/* Fix mobile input overflow */
+input[type="date"],
+input[type="time"],
+input[type="number"] {
+  min-width: 0;
+  max-width: 100%;
+}
+
+input[type="date"]::-webkit-date-and-time-value,
+input[type="time"]::-webkit-date-and-time-value {
+  text-align: left;
+}
+
 @media print {
   @page {
     margin: 1cm;
