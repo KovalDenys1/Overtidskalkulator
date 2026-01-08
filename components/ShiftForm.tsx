@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { Shift } from "@/lib/types";
+import { trackShiftAdded } from "@/lib/analytics";
 
 const todayISO = () => new Date().toISOString().slice(0, 10);
 
@@ -24,6 +25,7 @@ export default function ShiftForm({
         e.preventDefault();
         setLoading(true);
         await Promise.resolve(onAdd({ date, startTime, endTime, breakMinutes }));
+        trackShiftAdded();
         setLoading(false);
         setJustAdded(true);
         setTimeout(() => setJustAdded(false), 600);

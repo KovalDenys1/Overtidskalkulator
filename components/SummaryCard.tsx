@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import type { CalcResult, Shift, Settings } from "@/lib/types";
 import { loadIsPro, incrementMetric } from "@/lib/storage";
 import { exportToPDF, exportToCSV } from "@/lib/export";
+import { trackExportPdfClicked, trackExportCsvClicked, trackProModalOpened } from "@/lib/analytics";
 import ProModal from "./ProModal";
 
 export default function SummaryCard({
@@ -25,8 +26,10 @@ export default function SummaryCard({
   const handlePDFClick = () => {
     if (isPro) {
       incrementMetric("export_pdf_click_count");
+      trackExportPdfClicked();
       exportToPDF(shifts, settings, result);
     } else {
+      trackProModalOpened();
       setShowProModal(true);
     }
   };
@@ -34,8 +37,10 @@ export default function SummaryCard({
   const handleCSVClick = () => {
     if (isPro) {
       incrementMetric("export_csv_click_count");
+      trackExportCsvClicked();
       exportToCSV(shifts, settings);
     } else {
+      trackProModalOpened();
       setShowProModal(true);
     }
   };

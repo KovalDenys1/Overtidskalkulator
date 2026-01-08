@@ -121,3 +121,29 @@ export function incrementMetric(key: keyof Metrics) {
   metrics[key] = (metrics[key] || 0) + 1;
   localStorage.setItem(METRICS_KEY, JSON.stringify(metrics));
 }
+
+// Helper function to export waitlist emails as CSV
+export function exportWaitlistToCSV() {
+  const emails = loadWaitlistEmails();
+  if (emails.length === 0) {
+    console.log("No emails in waitlist");
+    return;
+  }
+  
+  const csvContent = "email\n" + emails.join("\n");
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const link = document.createElement("a");
+  const url = URL.createObjectURL(blob);
+  link.setAttribute("href", url);
+  link.setAttribute("download", `waitlist_${new Date().toISOString().split("T")[0]}.csv`);
+  link.style.visibility = "hidden";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  console.log(`Exported ${emails.length} emails to CSV`);
+}
+
+// Make it available globally for dev use
+if (typeof window !== "undefined") {
+  (window as any).exportWaitlistToCSV = exportWaitlistToCSV;
+}
