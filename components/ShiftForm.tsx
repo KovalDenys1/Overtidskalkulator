@@ -14,13 +14,19 @@ export default function ShiftForm({
   const [startTime, setStartTime] = useState("16:00");
   const [endTime, setEndTime] = useState("22:00");
   const [breakMinutes, setBreakMinutes] = useState<number>(30);
+  const [loading, setLoading] = useState(false);
+  const [justAdded, setJustAdded] = useState(false);
 
   return (
     <form
       className="w-full max-w-full rounded-2xl border p-4 shadow-sm space-y-3"
-      onSubmit={(e) => {
+      onSubmit={async (e) => {
         e.preventDefault();
-        onAdd({ date, startTime, endTime, breakMinutes });
+        setLoading(true);
+        await Promise.resolve(onAdd({ date, startTime, endTime, breakMinutes }));
+        setLoading(false);
+        setJustAdded(true);
+        setTimeout(() => setJustAdded(false), 600);
       }}
     >
       <h2 className="text-lg font-semibold">Legg til vakt</h2>
@@ -74,9 +80,13 @@ export default function ShiftForm({
         </label>
       </div>
 
-        <button className="w-full max-w-full rounded-xl border px-3 py-3 min-h-12 font-medium hover:bg-black/5" type="submit">
-        Legg til
-      </button>
+        <button
+          className={`w-full max-w-full rounded-xl border px-3 py-3 min-h-12 font-medium hover:bg-black/5 transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${justAdded ? 'bg-green-100 border-green-400 text-green-900' : ''}`}
+          type="submit"
+          disabled={loading}
+        >
+          {justAdded ? "Lagt til" : loading ? "Legger til..." : "Legg til vakt"}
+        </button>
     </form>
   );
 }
