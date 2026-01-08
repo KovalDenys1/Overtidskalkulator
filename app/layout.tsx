@@ -1,5 +1,6 @@
 import "./globals.css";
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
   title: "Overtidskalkulator for Norge | Beregn overtidstillegg",
@@ -26,6 +27,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             © {new Date().getFullYear()} Overtidskalkulator • Ikke juridisk rådgivning
           </footer>
         </div>
+        <Analytics />
       </body>
     </html>
   );
