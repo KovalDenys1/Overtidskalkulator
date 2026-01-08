@@ -57,6 +57,17 @@ Følg instruksjonene i terminalen.
 - `/components/*` - UI-komponenter
 - `/public/robots.txt` og `/public/sitemap.xml` - SEO
 
+## Endringer (mobilfikser)
+
+- `/components/ShiftForm.tsx`: grid satt til én kolonne som default (`grid-cols-1` → to kolonner først fra `md`), `min-w-0` på grid + inputs/labels, full bredde på form og knapp.
+- `/app/globals.css`: eksplisitt `min-width: 0` og `max-width: 100%` for `date/time/number` inputs (iOS Safari-tilpasning) + justert tekstjustering.
+- `/app/layout.tsx`: la til eksplisitt viewport (`width=device-width, initial-scale=1`) for riktig skalering på mobil.
+
+### Slik tester du
+
+1. Åpne Chrome DevTools → Device toolbar → velg "iPhone 15 Pro Max" → sjekk at "Legg til vakt" er i én kolonne og ingen horisontal scroll.
+2. I Safari på iPhone: åpne siden, dra horisontalt for å bekrefte at ingen scroll, og sjekk at alle inputs/brytere ligger i én kolonne med 100% bredde.
+
 ## Disclaimer
 
 Denne kalkulatoren er veiledende og tar ikke høyde for alle spesifikke arbeidsavtaler, tariffavtaler eller juridiske unntak. Brukere bør alltid sjekke sin egen arbeidsavtale og lønnsslipp for nøyaktige beregninger. Dette er ikke juridisk rådgivning.

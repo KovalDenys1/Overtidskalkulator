@@ -17,7 +17,7 @@ export default function ShiftForm({
 
   return (
     <form
-      className="rounded-2xl border p-4 shadow-sm space-y-3"
+      className="w-full max-w-full rounded-2xl border p-4 shadow-sm space-y-3"
       onSubmit={(e) => {
         e.preventDefault();
         onAdd({ date, startTime, endTime, breakMinutes });
@@ -25,7 +25,7 @@ export default function ShiftForm({
     >
       <h2 className="text-lg font-semibold">Legg til vakt</h2>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div className="grid min-w-0 grid-cols-1 gap-3 md:grid-cols-2">
         <label className="space-y-1 min-w-0">
           <div className="text-sm opacity-80">Dato</div>
           <input

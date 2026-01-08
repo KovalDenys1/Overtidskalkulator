@@ -7,6 +7,11 @@ export const metadata: Metadata = {
     "Beregn overtidstimer og tillegg etter norsk arbeidsmiljølov. Gratis veiledende kalkulator for daglig og ukentlig overtid med minimum 40% tillegg.",
 };
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="no">
