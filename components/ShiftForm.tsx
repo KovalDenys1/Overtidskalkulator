@@ -25,42 +25,42 @@ export default function ShiftForm({
     >
       <h2 className="text-lg font-semibold">Legg til vakt</h2>
 
-      <div className="grid min-w-0 grid-cols-1 gap-3 md:grid-cols-2">
-        <label className="space-y-1 min-w-0">
+      <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2">
+          <label className="space-y-1 min-w-0 w-full block">
           <div className="text-sm opacity-80">Dato</div>
           <input
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className="w-full min-w-0 rounded-xl border px-3 py-2"
+              className="w-full max-w-full min-w-0 rounded-xl border px-3 py-3 min-h-12 appearance-none"
             required
           />
         </label>
 
         <label className="space-y-1 min-w-0">
-          <div className="text-sm opacity-80">Start</div>
+            <div className="text-sm opacity-80">Start</div>
           <input
             type="time"
             value={startTime}
             onChange={(e) => setStartTime(e.target.value)}
-            className="w-full min-w-0 rounded-xl border px-3 py-2"
+              className="w-full max-w-full min-w-0 rounded-xl border px-3 py-3 min-h-12 appearance-none"
             required
           />
         </label>
 
         <label className="space-y-1 min-w-0">
-          <div className="text-sm opacity-80">Slutt</div>
+            <div className="text-sm opacity-80">Slutt</div>
           <input
             type="time"
             value={endTime}
             onChange={(e) => setEndTime(e.target.value)}
-            className="w-full min-w-0 rounded-xl border px-3 py-2"
+              className="w-full max-w-full min-w-0 rounded-xl border px-3 py-3 min-h-12 appearance-none"
             required
           />
         </label>
 
         <label className="space-y-1 min-w-0">
-          <div className="text-sm opacity-80">Pause (min)</div>
+            <div className="text-sm opacity-80">Pause (min)</div>
           <input
             type="number"
             min={0}
@@ -69,12 +69,12 @@ export default function ShiftForm({
               const val = Number(e.target.value);
               setBreakMinutes(isNaN(val) || val < 0 ? 0 : val);
             }}
-            className="w-full min-w-0 rounded-xl border px-3 py-2"
+              className="w-full max-w-full min-w-0 rounded-xl border px-3 py-3 min-h-12 appearance-none"
           />
         </label>
       </div>
 
-      <button className="w-full rounded-xl border px-3 py-2 font-medium hover:bg-black/5" type="submit">
+        <button className="w-full max-w-full rounded-xl border px-3 py-3 min-h-12 font-medium hover:bg-black/5" type="submit">
         Legg til
       </button>
     </form>
