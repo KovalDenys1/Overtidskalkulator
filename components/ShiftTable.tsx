@@ -56,7 +56,7 @@ export default function ShiftTable({
                   shift.breakMinutes
                 );
                 return (
-                  <tr key={shift.id} className="border-t hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors">
+                  <tr key={shift.id} className="border-t">
                     <td className="py-2 pr-3">{shift.date}</td>
                     <td className="py-2 pr-3">{shift.startTime}</td>
                     <td className="py-2 pr-3">{shift.endTime}</td>
