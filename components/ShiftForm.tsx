@@ -34,41 +34,45 @@ export default function ShiftForm({
       <h2 className="text-lg font-semibold">Legg til vakt</h2>
 
       <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2">
-          <label className="space-y-1 min-w-0 w-full block">
-          <div className="text-sm opacity-80">Dato</div>
+        <label className="space-y-1 min-w-0 w-full block">
+          <div className="text-sm font-medium text-gray-700">Dato</div>
           <input
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-              className="w-full max-w-full min-w-0 rounded-xl border px-3 py-3 min-h-12 appearance-none"
+            className="w-full max-w-full min-w-0 rounded-xl border px-3 py-3 min-h-12 appearance-none"
             required
           />
         </label>
 
-        <label className="space-y-1 min-w-0">
-            <div className="text-sm opacity-80">Start</div>
-          <input
-            type="time"
-            value={startTime}
-            onChange={(e) => setStartTime(e.target.value)}
-              className="w-full max-w-full min-w-0 rounded-xl border px-3 py-3 min-h-12 appearance-none"
-            required
-          />
-        </label>
+        <div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 rounded-xl bg-gray-50 border border-gray-200">
+          <label className="space-y-1 min-w-0">
+            <div className="text-sm font-medium text-gray-700">Start</div>
+            <input
+              type="time"
+              value={startTime}
+              onChange={(e) => setStartTime(e.target.value)}
+              step="3600"
+              className="w-full max-w-full min-w-0 rounded-xl border px-3 py-3 min-h-12 appearance-none bg-white"
+              required
+            />
+          </label>
+
+          <label className="space-y-1 min-w-0">
+            <div className="text-sm font-medium text-gray-700">Slutt</div>
+            <input
+              type="time"
+              value={endTime}
+              onChange={(e) => setEndTime(e.target.value)}
+              step="3600"
+              className="w-full max-w-full min-w-0 rounded-xl border px-3 py-3 min-h-12 appearance-none bg-white"
+              required
+            />
+          </label>
+        </div>
 
         <label className="space-y-1 min-w-0">
-            <div className="text-sm opacity-80">Slutt</div>
-          <input
-            type="time"
-            value={endTime}
-            onChange={(e) => setEndTime(e.target.value)}
-              className="w-full max-w-full min-w-0 rounded-xl border px-3 py-3 min-h-12 appearance-none"
-            required
-          />
-        </label>
-
-        <label className="space-y-1 min-w-0">
-            <div className="text-sm opacity-80">Pause (min)</div>
+          <div className="text-sm font-medium text-gray-700">Pause (min)</div>
           <input
             type="number"
             min={0}
@@ -77,18 +81,19 @@ export default function ShiftForm({
               const val = Number(e.target.value);
               setBreakMinutes(isNaN(val) || val < 0 ? 0 : val);
             }}
-              className="w-full max-w-full min-w-0 rounded-xl border px-3 py-3 min-h-12 appearance-none"
+            className="w-full max-w-full min-w-0 rounded-xl border px-3 py-3 min-h-12 appearance-none"
           />
+          <div className="text-xs text-gray-600">Tid uten betaling (pauser/lunsj)</div>
         </label>
       </div>
 
-        <button
-          className={`w-full max-w-full rounded-xl border px-3 py-3 min-h-12 font-medium hover:bg-black/5 transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${justAdded ? 'bg-green-100 border-green-400 text-green-900' : ''}`}
-          type="submit"
-          disabled={loading}
-        >
-          {justAdded ? "Lagt til" : loading ? "Legger til..." : "Legg til vakt"}
-        </button>
+      <button
+        className={`w-full max-w-full rounded-xl px-4 py-3.5 min-h-12 font-semibold transition-all disabled:opacity-60 disabled:cursor-not-allowed shadow-sm ${justAdded ? 'bg-green-600 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white'}`}
+        type="submit"
+        disabled={loading}
+      >
+        {justAdded ? "✓ Lagt til" : loading ? "Legger til..." : "Legg til vakt"}
+      </button>
     </form>
   );
 }

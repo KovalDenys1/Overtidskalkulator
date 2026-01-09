@@ -49,6 +49,16 @@ vercel
 
 Følg instruksjonene i terminalen.
 
+## Environment Variables
+
+For Pro waitlist integrering med Formspree, legg til i `.env.local`:
+
+```bash
+NEXT_PUBLIC_FORMSPREE_WAITLIST_ENDPOINT=https://formspree.io/f/xgoowvjj
+```
+
+**Viktig:** Når du deployer til Vercel, legg til samme miljøvariabel i Vercel dashboard under "Settings > Environment Variables".
+
 ## Viktige filer
 
 - `/app/page.tsx` - Hovedside med kalkulator
