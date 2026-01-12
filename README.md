@@ -79,3 +79,28 @@ Denne kalkulatoren er veiledende og tar ikke høyde for alle spesifikke arbeidsa
 - Tailwind CSS
 - Ingen ekstern database (localStorage for MVP)
 
+## Environment variables (Formspree waitlist)
+
+To enable real waitlist submissions to Formspree and proper analytics tracking on success, set the following environment variable.
+
+- **Name:** `NEXT_PUBLIC_FORMSPREE_WAITLIST_ENDPOINT`
+- **Example value:** `https://formspree.io/f/xgoowvjj`
+
+Local (development): create a `.env.local` file in the project root and add:
+
+```env
+NEXT_PUBLIC_FORMSPREE_WAITLIST_ENDPOINT="https://formspree.io/f/xgoowvjj"
+```
+
+Vercel (production): go to your Project → Settings → Environment Variables and add the same variable name and value. Use `Preview`/`Production` as needed.
+
+Notes:
+- The frontend only uses this public env var to POST the email to Formspree. Analytics will only fire the `submit_email_waitlist` event after the POST returns `res.ok === true`.
+- No email or other PII is sent to analytics — only a non-identifying `source` and `device` are included in the payload.
+ 
+Clarification of analytics events related to waitlist submissions:
+
+- `submit_email_waitlist`: fired only when `NEXT_PUBLIC_FORMSPREE_WAITLIST_ENDPOINT` is set AND the POST to that endpoint returns `res.ok === true`. This represents a real, successful submission to Formspree.
+- `submit_email_waitlist_local_only`: fired when the env var is NOT set and the app falls back to saving the email locally. This prevents inflating real submission metrics when Formspree is not configured.
+- `submit_email_waitlist_failed`: fired when a POST to the configured endpoint fails or returns a non-OK response. No email or PII is included in any of these events.
+

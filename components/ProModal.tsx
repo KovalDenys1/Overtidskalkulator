@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { saveIsPro, saveWaitlistEmail, loadWaitlistEmails, incrementMetric } from "@/lib/storage";
-import { trackProModalOpened, trackWaitlistSubmitted } from "@/lib/analytics";
+import { trackEvent } from "@/lib/analytics";
 import type { CalcResult, Shift, Settings } from "@/lib/types";
 
 type ProModalProps = {
@@ -21,7 +21,6 @@ export default function ProModal({ isOpen, onClose, shifts, settings, result }: 
   useEffect(() => {
     if (isOpen) {
       incrementMetric("pro_modal_open_count");
-      trackProModalOpened();
     }
   }, [isOpen]);
 
@@ -34,12 +33,43 @@ export default function ProModal({ isOpen, onClose, shifts, settings, result }: 
     window.location.reload();
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email.trim()) {
-      saveWaitlistEmail(email.trim());
+    const value = email.trim();
+    if (!value) return;
+
+    const endpoint = process.env.NEXT_PUBLIC_FORMSPREE_WAITLIST_ENDPOINT;
+
+    if (endpoint) {
+      try {
+        const res = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: value }),
+        });
+
+        if (res.ok) {
+          saveWaitlistEmail(value);
+          incrementMetric("pro_send_count");
+          const device = typeof window !== "undefined" ? (window.innerWidth < 768 ? "mobile" : "desktop") : "desktop";
+          trackEvent("submit_email_waitlist", { source: "pro_modal", device });
+          setSubmitted(true);
+        } else {
+          // optional: track failure without PII
+          const device = typeof window !== "undefined" ? (window.innerWidth < 768 ? "mobile" : "desktop") : "desktop";
+          trackEvent("submit_email_waitlist_failed", { source: "pro_modal", device });
+        }
+      } catch {
+        const device = typeof window !== "undefined" ? (window.innerWidth < 768 ? "mobile" : "desktop") : "desktop";
+        trackEvent("submit_email_waitlist_failed", { source: "pro_modal", device });
+      }
+    } else {
+      // Fallback: if no endpoint configured, keep previous local-save behavior
+      // BUT track a distinct local-only event so we don't inflate real submit metrics.
+      saveWaitlistEmail(value);
       incrementMetric("pro_send_count");
-      trackWaitlistSubmitted();
+      const device = typeof window !== "undefined" ? (window.innerWidth < 768 ? "mobile" : "desktop") : "desktop";
+      trackEvent("submit_email_waitlist_local_only", { source: "pro_modal", device });
       setSubmitted(true);
     }
   };

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import type { CalcResult, Shift, Settings } from "@/lib/types";
 import { loadIsPro, incrementMetric } from "@/lib/storage";
 import { exportToPDF, exportToCSV } from "@/lib/export";
-import { trackExportPdfClicked, trackExportCsvClicked, trackProModalOpened } from "@/lib/analytics";
+import { trackExportPdfClicked, trackExportCsvClicked, trackEvent } from "@/lib/analytics";
 import ProModal from "./ProModal";
 
 export default function SummaryCard({
@@ -29,7 +29,8 @@ export default function SummaryCard({
       trackExportPdfClicked();
       exportToPDF(shifts, settings, result);
     } else {
-      trackProModalOpened();
+      const device = typeof window !== "undefined" ? (window.innerWidth < 768 ? "mobile" : "desktop") : "desktop";
+      trackEvent("open_pro_modal", { source: "summary_card", type: "pdf", device });
       setShowProModal(true);
     }
   };
@@ -40,7 +41,8 @@ export default function SummaryCard({
       trackExportCsvClicked();
       exportToCSV(shifts, settings);
     } else {
-      trackProModalOpened();
+      const device = typeof window !== "undefined" ? (window.innerWidth < 768 ? "mobile" : "desktop") : "desktop";
+      trackEvent("open_pro_modal", { source: "summary_card", type: "csv", device });
       setShowProModal(true);
     }
   };
