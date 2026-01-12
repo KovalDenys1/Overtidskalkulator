@@ -20,6 +20,22 @@ npm run dev
 
 Åpne [http://localhost:3000](http://localhost:3000)
 
+### pnpm build approval (optional)
+
+If you encounter a pnpm warning like:
+
+```
+Ignored build scripts: unrs-resolver@1.11.1. Run pnpm approve-builds ...
+```
+
+You can approve builds locally with:
+
+```bash
+pnpm approve-builds
+```
+
+Approving builds is safe if you trust the lockfile; it's optional for local development. In CI (Vercel) you can either approve builds in the environment or ignore the warning.
+
 ## Production build
 
 ```bash
