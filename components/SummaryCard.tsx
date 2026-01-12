@@ -5,7 +5,7 @@ import type { CalcResult, Shift, Settings } from "@/lib/types";
 import { loadIsPro, incrementMetric } from "@/lib/storage";
 import { exportToPDF, exportToCSV } from "@/lib/export";
 import { trackExportPdfClicked, trackExportCsvClicked, trackEvent } from "@/lib/analytics";
-import ProModal from "./ProModal";
+import ProModal from "./ProModalResolved";
 
 export default function SummaryCard({
   result,
@@ -61,10 +61,10 @@ export default function SummaryCard({
         <Stat
           label="Overtidstillegg"
           value={`${result.overtimeExtra} kr`}
-          helperText="Ekstra betaling for overtidstimer"
+          helperText="Ekstra betaling for overtid (40%/50%/100%)"
         />
         <div className="space-y-2">
-          <Stat label="Totalt å få utbetalt" value={`${result.totalPay} kr`} highlight />
+          <Stat label="Totalt (brutto)" value={`${result.totalPay} kr`} highlight />
           <button
             className="w-full rounded-xl border px-3 py-2 font-medium hover:bg-black/5 text-sm"
             onClick={handlePDFClick}
@@ -84,11 +84,11 @@ export default function SummaryCard({
 
       <ProModal isOpen={showProModal} onClose={() => setShowProModal(false)} shifts={shifts} settings={settings} result={result} />
 
-      <div className="space-y-2 text-xs opacity-70">
+      <div className="space-y-2 text-xs text-gray-700">
         <div>
           Daglig overtid (sum): <b>{result.dailyOvertimeSum}</b> t • Ukentlig overtid (sum): <b>{result.weeklyOvertimeSum}</b> t
           <br />
-          <span className="opacity-60">
+          <span className="text-gray-600">
             Vi bruker største av daglig/ukentlig for å unngå dobbelttelling av samme timer.
           </span>
         </div>
@@ -121,10 +121,10 @@ function Stat({
   highlight?: boolean;
 }) {
   return (
-    <div className={`rounded-xl border p-3 ${highlight ? "bg-black/5 border-2 border-black/20" : ""}`}>
-      <div className="text-xs opacity-70">{label}</div>
+    <div className={`rounded-xl border p-3 ${highlight ? "bg-blue-50 border-2 border-blue-400" : ""}`}>
+      <div className="text-xs font-medium text-gray-600">{label}</div>
       <div className={`font-semibold ${highlight ? "text-xl" : "text-lg"}`}>{value}</div>
-      {helperText && <div className="text-xs opacity-60 mt-1">{helperText}</div>}
+      {helperText && <div className="text-xs text-gray-600 mt-1">{helperText}</div>}
     </div>
   );
 }

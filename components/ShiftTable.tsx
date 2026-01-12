@@ -22,13 +22,13 @@ export default function ShiftTable({
         <h2 className="text-lg font-semibold">Vakter</h2>
         <div className="flex gap-2">
           <button
-            className="text-sm underline opacity-80 hover:opacity-100 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+            className="text-sm px-3 py-1.5 rounded-lg border border-red-300 bg-white hover:bg-red-50 font-medium text-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white"
             onClick={onClear}
             type="button"
             disabled={isEmpty}
             aria-label="Fjern alle vakter"
           >
-            Tøm alt
+            🗑️ Tøm alt
           </button>
         </div>
       </div>
@@ -38,14 +38,14 @@ export default function ShiftTable({
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="text-left opacity-70 text-xs uppercase tracking-wide">
+            <thead className="text-left text-xs uppercase tracking-wide bg-gray-50">
               <tr>
-                <th className="py-2 pr-3 font-semibold">Dato</th>
-                <th className="py-2 pr-3 font-semibold">Start</th>
-                <th className="py-2 pr-3 font-semibold">Slutt</th>
-                <th className="py-2 pr-3 font-semibold">Pause</th>
-                <th className="py-2 pr-3 font-semibold">Timer</th>
-                <th className="py-2 pr-3 font-semibold">Handling</th>
+                <th className="py-2 pr-3 font-semibold text-gray-700">Dato</th>
+                <th className="py-2 pr-3 font-semibold text-gray-700">Start</th>
+                <th className="py-2 pr-3 font-semibold text-gray-700">Slutt</th>
+                <th className="py-2 pr-3 font-semibold text-gray-700">Pause</th>
+                <th className="py-2 pr-3 font-semibold text-gray-700">Timer</th>
+                <th className="py-2 pr-3 font-semibold text-gray-700">Handling</th>
               </tr>
             </thead>
             <tbody>
@@ -64,7 +64,7 @@ export default function ShiftTable({
                     <td className="py-2 pr-3 font-medium">{hours.toFixed(2)}t</td>
                     <td className="py-2 text-right">
                       <button
-                        className="text-sm underline opacity-80 hover:opacity-100 transition-opacity"
+                        className="text-xs px-2 py-1 rounded border border-gray-300 bg-white hover:bg-gray-50 font-medium text-gray-700 transition-colors"
                         onClick={() => onDelete(shift.id)}
                         type="button"
                         aria-label={`Fjern vakt fra ${shift.date}`}

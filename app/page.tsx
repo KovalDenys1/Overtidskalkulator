@@ -27,8 +27,8 @@ export default function Page() {
         </div>
       </div>
 
-      <div className="mt-8 space-y-4 text-sm opacity-80 max-w-3xl">
-        <h2 className="text-lg font-semibold opacity-100">Overtid i Norge</h2>
+      <div className="mt-8 space-y-4 text-sm text-gray-700 max-w-3xl">
+        <h2 className="text-lg font-semibold text-gray-900">Overtid i Norge</h2>
         <p>
           Overtid er arbeid utover normal arbeidstid. I Norge er det vanlig at overtidstimer gir rett til
           overtidstillegg på minimum 40% etter Arbeidsmiljøloven. Mange arbeidsavtaler og tariffavtaler gir høyere
@@ -38,7 +38,7 @@ export default function Page() {
           Overtid kan beregnes både daglig (f.eks. mer enn 9 timer per dag) og ukentlig (f.eks. mer enn 40 timer per
           uke). De faktiske reglene avhenger av din arbeidsavtale, tariff eller kontrakt.
         </p>
-        <p className="opacity-70">
+        <p className="text-gray-600">
           Denne kalkulatoren er veiledende og tar ikke høyde for alle spesifikke regler. Sjekk alltid din
           arbeidsavtale og lønnsslipp for nøyaktige beregninger.
         </p>
