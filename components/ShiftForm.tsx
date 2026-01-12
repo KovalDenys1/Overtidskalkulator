@@ -14,6 +14,10 @@ export default function ShiftForm({
   const [date, setDate] = useState<string>(todayISO());
   const [startTime, setStartTime] = useState("16:00");
   const [endTime, setEndTime] = useState("22:00");
+  const [startHour, setStartHour] = useState<number>(16);
+  const [startMinute, setStartMinute] = useState<number>(0);
+  const [endHour, setEndHour] = useState<number>(22);
+  const [endMinute, setEndMinute] = useState<number>(0);
   const [breakMinutes, setBreakMinutes] = useState<number>(30);
   const [loading, setLoading] = useState(false);
   const [justAdded, setJustAdded] = useState(false);
@@ -24,7 +28,12 @@ export default function ShiftForm({
       onSubmit={async (e) => {
         e.preventDefault();
         setLoading(true);
-        await Promise.resolve(onAdd({ date, startTime, endTime, breakMinutes }));
+        const pad = (n: number) => n.toString().padStart(2, "0");
+        const s = `${pad(startHour)}:${pad(startMinute)}`;
+        const en = `${pad(endHour)}:${pad(endMinute)}`;
+        setStartTime(s);
+        setEndTime(en);
+        await Promise.resolve(onAdd({ date, startTime: s, endTime: en, breakMinutes }));
         const device = typeof window !== "undefined" ? (window.innerWidth < 768 ? "mobile" : "desktop") : "desktop";
         trackEvent("add_shift", { source: "main_form", device });
         setLoading(false);
@@ -49,26 +58,60 @@ export default function ShiftForm({
         <div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 rounded-xl bg-gray-50 border border-gray-200">
           <label className="space-y-1 min-w-0">
             <div className="text-sm font-medium text-gray-700">Start</div>
-            <input
-              type="time"
-              value={startTime}
-              onChange={(e) => setStartTime(e.target.value)}
-              step="3600"
-              className="w-full max-w-full min-w-0 rounded-xl border px-3 py-3 min-h-12 appearance-none bg-white"
-              required
-            />
+            <div className="flex gap-2">
+              <select
+                aria-label="Start hour"
+                value={startHour}
+                onChange={(e) => setStartHour(Number(e.target.value))}
+                className="w-1/2 max-w-full min-w-0 rounded-xl border px-3 py-3 appearance-none bg-white"
+              >
+                {Array.from({ length: 24 }).map((_, i) => (
+                  <option key={i} value={i}>
+                    {i.toString().padStart(2, "0")}
+                  </option>
+                ))}
+              </select>
+              <select
+                aria-label="Start minute"
+                value={startMinute}
+                onChange={(e) => setStartMinute(Number(e.target.value))}
+                className="w-1/2 max-w-full min-w-0 rounded-xl border px-3 py-3 appearance-none bg-white"
+              >
+                <option value={0}>00</option>
+                <option value={15}>15</option>
+                <option value={30}>30</option>
+                <option value={45}>45</option>
+              </select>
+            </div>
           </label>
 
           <label className="space-y-1 min-w-0">
             <div className="text-sm font-medium text-gray-700">Slutt</div>
-            <input
-              type="time"
-              value={endTime}
-              onChange={(e) => setEndTime(e.target.value)}
-              step="3600"
-              className="w-full max-w-full min-w-0 rounded-xl border px-3 py-3 min-h-12 appearance-none bg-white"
-              required
-            />
+            <div className="flex gap-2">
+              <select
+                aria-label="End hour"
+                value={endHour}
+                onChange={(e) => setEndHour(Number(e.target.value))}
+                className="w-1/2 max-w-full min-w-0 rounded-xl border px-3 py-3 appearance-none bg-white"
+              >
+                {Array.from({ length: 24 }).map((_, i) => (
+                  <option key={i} value={i}>
+                    {i.toString().padStart(2, "0")}
+                  </option>
+                ))}
+              </select>
+              <select
+                aria-label="End minute"
+                value={endMinute}
+                onChange={(e) => setEndMinute(Number(e.target.value))}
+                className="w-1/2 max-w-full min-w-0 rounded-xl border px-3 py-3 appearance-none bg-white"
+              >
+                <option value={0}>00</option>
+                <option value={15}>15</option>
+                <option value={30}>30</option>
+                <option value={45}>45</option>
+              </select>
+            </div>
           </label>
         </div>
 
