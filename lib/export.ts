@@ -9,49 +9,47 @@ function escapeCsvValue(value: string | number): string {
   return str;
 }
 
-export function exportToCSV(shifts: Shift[], settings: Settings): void {
-  const { hourlyRate, overtimeMultiplier, dailyLimitHours } = settings;
+export function exportToCSV(shifts: Shift[], settings: Settings, result: CalcResult): void {
+  const { hourlyRate, overtimeMultiplier } = settings;
 
   // Headers
-  const headers = [
-    "Dato",
-    "Start",
-    "Slutt",
-    "Pause (min)",
-    "Timer",
-    "Overtid (timer)",
-    "Timesats",
-    "Overtidstillegg",
-    "Sum (kr)",
-  ];
+  const headers = ["Dato", "Start", "Slutt", "Pause (min)", "Timer"];
 
   // Sort shifts by date
   const sortedShifts = [...shifts].sort((a, b) => a.date.localeCompare(b.date));
 
-  // Calculate rows
+  // Per-shift rows show raw worked hours only. Overtime/pay are NOT split per
+  // row here: calcOvertid() reconciles daily vs. weekly limits by taking
+  // Math.max(dailyOvertimeSum, weeklyOvertimeSum) across the whole period, so
+  // there is no single-shift overtime figure that would sum back to that
+  // total in every case. Summing per-row estimates (as this used to do) could
+  // silently disagree with the totals shown on screen. Instead, mirror
+  // exportToPDF()/print page: raw hours per row, accurate totals from the
+  // already-reconciled CalcResult below.
   const rows = sortedShifts.map((shift) => {
     const hours = calcShiftHours(shift.startTime, shift.endTime, shift.breakMinutes);
-    const overtime = Math.max(0, hours - dailyLimitHours);
-    const ordinaryPay = hours * hourlyRate;
-    const overtimePay = overtime * hourlyRate * (overtimeMultiplier - 1);
-    const sum = ordinaryPay + overtimePay;
-
-    return [
-      shift.date,
-      shift.startTime,
-      shift.endTime,
-      shift.breakMinutes,
-      hours.toFixed(2),
-      overtime > 0 ? overtime.toFixed(2) : "",
-      hourlyRate,
-      `${((overtimeMultiplier - 1) * 100).toFixed(0)}%`,
-      sum.toFixed(2),
-    ];
+    return [shift.date, shift.startTime, shift.endTime, shift.breakMinutes, hours.toFixed(2)];
   });
+
+  const summaryRows = [
+    [],
+    ["Oppsummering"],
+    ["Totale timer", result.totalHours],
+    ["Ordinære timer", result.ordinaryHours],
+    ["Overtidstimer", result.overtimeHours],
+    ["Timesats", hourlyRate],
+    ["Overtidstillegg", `${((overtimeMultiplier - 1) * 100).toFixed(0)}%`],
+    ["Grunnlønn (kr)", result.basePay.toFixed(2)],
+    ["Overtidstillegg (kr)", result.overtimeExtra.toFixed(2)],
+    ["Totalt (kr)", result.totalPay.toFixed(2)],
+  ];
 
   // Create CSV content
   const csvLines = [headers.map(escapeCsvValue).join(",")];
   rows.forEach((row) => {
+    csvLines.push(row.map(escapeCsvValue).join(","));
+  });
+  summaryRows.forEach((row) => {
     csvLines.push(row.map(escapeCsvValue).join(","));
   });
 

@@ -43,7 +43,7 @@ export default function SummaryCard({
     if (isPro) {
       incrementMetric("export_csv_click_count");
       trackExportCsvClicked();
-      exportToCSV(shifts, settings);
+      exportToCSV(shifts, settings, result);
     } else {
       const device = typeof window !== "undefined" ? (window.innerWidth < 768 ? "mobile" : "desktop") : "desktop";
       trackEvent("open_pro_modal", { source: "summary_card", type: "csv", device });
