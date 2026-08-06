@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import type { Shift } from "@/lib/types";
 import { calcShiftHours } from "@/lib/calc";
 
@@ -15,6 +16,24 @@ export default function ShiftTable({
   onClear,
 }: ShiftTableProps) {
   const isEmpty = shifts.length === 0;
+  const sortedShifts = [...shifts].sort((a, b) => a.date.localeCompare(b.date));
+
+  const [confirmingClear, setConfirmingClear] = useState(false);
+
+  useEffect(() => {
+    if (!confirmingClear) return;
+    const timeout = setTimeout(() => setConfirmingClear(false), 4000);
+    return () => clearTimeout(timeout);
+  }, [confirmingClear]);
+
+  const handleClearClick = () => {
+    if (confirmingClear) {
+      onClear();
+      setConfirmingClear(false);
+    } else {
+      setConfirmingClear(true);
+    }
+  };
 
   return (
     <div className="rounded-2xl border p-4 shadow-sm space-y-3">
@@ -22,13 +41,17 @@ export default function ShiftTable({
         <h2 className="text-lg font-semibold">Vakter</h2>
         <div className="flex gap-2">
           <button
-            className="text-sm px-3 py-1.5 rounded-lg border border-red-300 bg-white hover:bg-red-50 font-medium text-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white"
-            onClick={onClear}
+            className={`text-sm px-3 py-1.5 rounded-lg border font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white ${
+              confirmingClear
+                ? "border-red-600 bg-red-600 text-white hover:bg-red-700"
+                : "border-red-300 bg-white hover:bg-red-50 text-red-700"
+            }`}
+            onClick={handleClearClick}
             type="button"
             disabled={isEmpty}
-            aria-label="Fjern alle vakter"
+            aria-label={confirmingClear ? "Bekreft: fjern alle vakter" : "Fjern alle vakter"}
           >
-            🗑️ Tøm alt
+            {confirmingClear ? "Sikker? Trykk igjen" : "🗑️ Tøm alt"}
           </button>
         </div>
       </div>
@@ -49,7 +72,7 @@ export default function ShiftTable({
               </tr>
             </thead>
             <tbody>
-              {shifts.map((shift) => {
+              {sortedShifts.map((shift) => {
                 const hours = calcShiftHours(
                   shift.startTime,
                   shift.endTime,

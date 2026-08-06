@@ -39,6 +39,13 @@ export default function ShiftForm({
         setLoading(false);
         setJustAdded(true);
         setTimeout(() => setJustAdded(false), 600);
+
+        // Advance to the next day: shifts are usually entered in a
+        // chronological run (a whole work week at a time), so this saves a
+        // manual date-picker interaction between each one.
+        const next = new Date(date + "T12:00:00");
+        next.setDate(next.getDate() + 1);
+        setDate(next.toISOString().slice(0, 10));
       }}
     >
       <h2 className="text-lg font-semibold">Legg til vakt</h2>
