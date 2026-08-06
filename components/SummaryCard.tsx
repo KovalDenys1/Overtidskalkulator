@@ -20,6 +20,10 @@ export default function SummaryCard({
   const [showProModal, setShowProModal] = useState(false);
 
   useEffect(() => {
+    // See hooks/useShifts.ts for why this is setState-in-effect, not a lazy
+    // initializer: avoids an SSR/client hydration mismatch (no localStorage
+    // on the server).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsPro(loadIsPro());
   }, []);
 

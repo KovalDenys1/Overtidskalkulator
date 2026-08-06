@@ -1,10 +1,7 @@
-const { FlatCompat } = require('@eslint/eslintrc');
-
-const compat = new FlatCompat({ baseDirectory: __dirname });
+const nextCoreWebVitals = require('eslint-config-next/core-web-vitals');
 
 module.exports = [
-  // apply Next.js recommended configs via compatibility layer
-  ...compat.extends('next/core-web-vitals'),
+  ...nextCoreWebVitals,
   {
     ignores: ['.next/**', 'node_modules/**'],
     languageOptions: {

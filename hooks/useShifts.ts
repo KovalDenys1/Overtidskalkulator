@@ -13,6 +13,10 @@ export function useShifts() {
   const [settings, setSettings] = useState<Settings>(defaultSettings);
 
   useEffect(() => {
+    // Deliberately setState-in-effect, not a lazy useState initializer: SSR has
+    // no localStorage, so a lazy initializer would return different data on the
+    // server vs. the client's first render and trigger a hydration mismatch.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setShifts(loadShifts());
     setSettings(loadSettings());
   }, []);

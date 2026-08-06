@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 html, body {
   height: 100%;
@@ -27,9 +25,11 @@ input[type="time"]::-webkit-date-and-time-value {
   @page {
     margin: 1cm;
   }
-  .print\\:hidden {
-    display: none;
-  }
+  /* print:hidden is a real Tailwind utility class used in app/print/page.tsx
+     - Tailwind generates its own @media print rule for it automatically,
+     so no manual rule is needed here (a hand-written duplicate here used
+     to have a double-backslash escaping bug: `.print\\:hidden` doesn't
+     match the class Tailwind actually emits). */
   body {
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;

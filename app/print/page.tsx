@@ -17,6 +17,9 @@ export default function PrintPage() {
         const parsed = JSON.parse(stored);
         // Basic validation
         if (parsed && Array.isArray(parsed.shifts) && parsed.settings && parsed.result) {
+          // Reading localStorage, guarded above by the SSR check - setState-in-effect
+          // is correct here, not a lazy initializer (see hooks/useShifts.ts).
+          // eslint-disable-next-line react-hooks/set-state-in-effect
           setData(parsed);
         } else {
           setHasError(true);
