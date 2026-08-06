@@ -8,12 +8,30 @@ import Disclaimer from "@/components/Disclaimer";
 import { useShifts } from "@/hooks/useShifts";
 import { calcOvertid } from "@/lib/calc";
 
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: "Overtidskalkulator",
+  url: "https://overtidskalkulator.no",
+  description:
+    "Gratis veiledende kalkulator for overtidstimer og overtidstillegg etter norsk arbeidsmiljølov.",
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any",
+  offers: {
+    "@type": "Offer",
+    price: "0",
+    priceCurrency: "NOK",
+  },
+  inLanguage: "nb-NO",
+};
+
 export default function Page() {
   const { shifts, settings, addShift, deleteShift, clearAll, updateSettings, resetSettings } = useShifts();
   const result = calcOvertid(shifts, settings);
 
   return (
     <main className="space-y-6">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <div className="grid gap-6 lg:grid-cols-2">
         <div className="space-y-6">
           <ShiftForm onAdd={addShift} />

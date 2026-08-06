@@ -2,8 +2,11 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Kontakt | Overtidskalkulator",
+  title: "Kontakt",
   description: "Kontakt Overtidskalkulator for spørsmål, feil eller forslag.",
+  alternates: {
+    canonical: "/kontakt",
+  },
 };
 
 export default function KontaktPage() {
@@ -15,7 +18,7 @@ export default function KontaktPage() {
         </Link>
       </div>
       
-      <h1 className="text-2xl sm:text-3xl font-bold">Kontakt</h1>
+      <h2 className="text-2xl sm:text-3xl font-bold">Kontakt</h2>
       
       <div className="space-y-4 text-sm">
         <section className="space-y-2">
@@ -33,7 +36,7 @@ export default function KontaktPage() {
         </section>
 
         <section className="space-y-2">
-          <h2 className="text-lg font-semibold">Hva kan vi hjelpe med?</h2>
+          <h3 className="text-lg font-semibold">Hva kan vi hjelpe med?</h3>
           <ul className="list-disc list-inside space-y-1 opacity-80">
             <li>Spørsmål om hvordan kalkulatoren fungerer</li>
             <li>Rapportere feil eller bugs</li>
@@ -44,7 +47,7 @@ export default function KontaktPage() {
         </section>
 
         <section className="space-y-2">
-          <h2 className="text-lg font-semibold">Responstid</h2>
+          <h3 className="text-lg font-semibold">Responstid</h3>
           <p className="opacity-80">
             Vi svarer normalt innen 1-3 virkedager.
           </p>

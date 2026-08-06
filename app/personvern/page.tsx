@@ -2,8 +2,11 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Personvern | Overtidskalkulator",
+  title: "Personvern",
   description: "Personvernerklæring for Overtidskalkulator - hvordan vi håndterer dine data.",
+  alternates: {
+    canonical: "/personvern",
+  },
 };
 
 export default function PersonvernPage() {
@@ -15,11 +18,11 @@ export default function PersonvernPage() {
         </Link>
       </div>
       
-      <h1 className="text-2xl sm:text-3xl font-bold">Personvern</h1>
+      <h2 className="text-2xl sm:text-3xl font-bold">Personvern</h2>
       
       <div className="space-y-4 text-sm">
         <section className="space-y-2">
-          <h2 className="text-lg font-semibold">Datainnsamling</h2>
+          <h3 className="text-lg font-semibold">Datainnsamling</h3>
           <p>
             Overtidskalkulator lagrer alle vakter, innstillinger og beregninger lokalt i nettleseren din (localStorage). 
             Ingen data sendes til servere eller deles med tredjeparter.
@@ -27,7 +30,7 @@ export default function PersonvernPage() {
         </section>
 
         <section className="space-y-2">
-          <h2 className="text-lg font-semibold">E-post (Venteliste)</h2>
+          <h3 className="text-lg font-semibold">E-post (Venteliste)</h3>
           <p>
             Hvis du oppgir e-post for å bli varslet om Pro-abonnement, lagres denne lokalt på enheten din i MVP-fasen. 
             Ved lansering av betalingstjeneste vil e-postadresser kun brukes til å varsle om tilgjengelighet.
@@ -39,7 +42,7 @@ export default function PersonvernPage() {
         </section>
 
         <section className="space-y-2">
-          <h2 className="text-lg font-semibold">Analytics</h2>
+          <h3 className="text-lg font-semibold">Analytics</h3>
           <p>
             Vi bruker Vercel Analytics for å forstå hvordan tjenesten brukes. Dette hjelper oss med å forbedre brukeropplevelsen. 
             Vercel Analytics samler inn anonymisert brukerdata og respekterer personvernet ditt.
@@ -50,7 +53,7 @@ export default function PersonvernPage() {
         </section>
 
         <section className="space-y-2">
-          <h2 className="text-lg font-semibold">Informasjonskapsler (Cookies)</h2>
+          <h3 className="text-lg font-semibold">Informasjonskapsler (Cookies)</h3>
           <p>
             Vi bruker kun localStorage for å lagre dine vakter og innstillinger lokalt. 
             Ingen informasjonskapsler brukes for å spore deg på tvers av nettsteder.
@@ -58,7 +61,7 @@ export default function PersonvernPage() {
         </section>
 
         <section className="space-y-2">
-          <h2 className="text-lg font-semibold">Dine rettigheter</h2>
+          <h3 className="text-lg font-semibold">Dine rettigheter</h3>
           <p>
             Du har full kontroll over dataene dine. All data lagres lokalt i nettleseren, og du kan slette den når som helst 
             ved å tømme nettleserens lagring eller ved å bruke &quot;Tøm alle&quot;-funksjonen i kalkulatoren.
@@ -66,7 +69,7 @@ export default function PersonvernPage() {
         </section>
 
         <section className="space-y-2">
-          <h2 className="text-lg font-semibold">Kontakt</h2>
+          <h3 className="text-lg font-semibold">Kontakt</h3>
           <p>
             For spørsmål om personvern, kontakt oss på: <a href="mailto:kontakt@overtidskalkulator.no" className="underline hover:opacity-70">kontakt@overtidskalkulator.no</a>
           </p>

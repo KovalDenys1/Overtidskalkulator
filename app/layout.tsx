@@ -3,15 +3,40 @@ import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import Link from "next/link";
 
+const siteUrl = "https://overtidskalkulator.no";
+const title = "Overtidskalkulator for Norge | Beregn overtidstillegg";
+const description =
+  "Beregn overtidstimer og tillegg etter norsk arbeidsmiljølov. Gratis veiledende kalkulator for daglig og ukentlig overtid med minimum 40% tillegg.";
+
 export const metadata: Metadata = {
-  title: "Overtidskalkulator for Norge | Beregn overtidstillegg",
-  description:
-    "Beregn overtidstimer og tillegg etter norsk arbeidsmiljølov. Gratis veiledende kalkulator for daglig og ukentlig overtid med minimum 40% tillegg.",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: title,
+    template: "%s | Overtidskalkulator",
+  },
+  description,
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title,
+    description,
+    url: siteUrl,
+    siteName: "Overtidskalkulator",
+    locale: "nb_NO",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+  },
 };
 
 export const viewport = {
   width: "device-width",
   initialScale: 1,
+  themeColor: "#111827",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
