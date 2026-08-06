@@ -32,7 +32,7 @@ export default function PersonvernPage() {
         <section className="space-y-2">
           <h3 className="text-lg font-semibold">E-post (Venteliste)</h3>
           <p>
-            Hvis du oppgir e-post for å bli varslet om Pro-abonnement, lagres denne lokalt på enheten din i MVP-fasen. 
+            Hvis du oppgir e-post for å bli varslet om Pro-funksjoner, lagres denne lokalt på enheten din i MVP-fasen.
             Ved lansering av betalingstjeneste vil e-postadresser kun brukes til å varsle om tilgjengelighet.
           </p>
           <p>

@@ -93,7 +93,7 @@ export default function OmPage() {
             <li>Ubegrenset historikk</li>
           </ul>
           <p>
-            Pro vil være tilgjengelig som abonnement. Pris annonseres når tjenesten lanseres.
+            Pris og betalingsmodell er ikke bestemt ennå og annonseres når tjenesten lanseres.
           </p>
         </section>
 

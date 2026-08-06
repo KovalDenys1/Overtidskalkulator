@@ -59,48 +59,80 @@ export default function ShiftTable({
       {isEmpty ? (
         <p className="text-sm opacity-70">Ingen vakter enda.</p>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="text-left text-xs uppercase tracking-wide bg-gray-50">
-              <tr>
-                <th className="py-2 pr-3 font-semibold text-gray-700">Dato</th>
-                <th className="py-2 pr-3 font-semibold text-gray-700">Start</th>
-                <th className="py-2 pr-3 font-semibold text-gray-700">Slutt</th>
-                <th className="py-2 pr-3 font-semibold text-gray-700">Pause</th>
-                <th className="py-2 pr-3 font-semibold text-gray-700">Timer</th>
-                <th className="py-2 pr-3 font-semibold text-gray-700">Handling</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sortedShifts.map((shift) => {
-                const hours = calcShiftHours(
-                  shift.startTime,
-                  shift.endTime,
-                  shift.breakMinutes
-                );
-                return (
-                  <tr key={shift.id} className="border-t">
-                    <td className="py-2 pr-3">{shift.date}</td>
-                    <td className="py-2 pr-3">{shift.startTime}</td>
-                    <td className="py-2 pr-3">{shift.endTime}</td>
-                    <td className="py-2 pr-3">{shift.breakMinutes} min</td>
-                    <td className="py-2 pr-3 font-medium">{hours.toFixed(2)}t</td>
-                    <td className="py-2 text-right">
-                      <button
-                        className="text-xs px-2 py-1 rounded border border-gray-300 bg-white hover:bg-gray-50 font-medium text-gray-700 transition-colors"
-                        onClick={() => onDelete(shift.id)}
-                        type="button"
-                        aria-label={`Fjern vakt fra ${shift.date}`}
-                      >
-                        Slett
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+        <>
+          {/* Mobile: card list. A 6-column table forces horizontal scrolling
+              on narrow screens; a stacked card per shift reads better. */}
+          <div className="sm:hidden space-y-2">
+            {sortedShifts.map((shift) => {
+              const hours = calcShiftHours(shift.startTime, shift.endTime, shift.breakMinutes);
+              return (
+                <div key={shift.id} className="rounded-xl border p-3 flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="font-medium">{shift.date}</div>
+                    <div className="text-xs text-gray-600">
+                      {shift.startTime}–{shift.endTime} · {shift.breakMinutes} min pause
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 shrink-0">
+                    <div className="font-semibold">{hours.toFixed(2)}t</div>
+                    <button
+                      className="text-xs px-2 py-1 rounded border border-gray-300 bg-white hover:bg-gray-50 font-medium text-gray-700 transition-colors"
+                      onClick={() => onDelete(shift.id)}
+                      type="button"
+                      aria-label={`Fjern vakt fra ${shift.date}`}
+                    >
+                      Slett
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Desktop/tablet: table */}
+          <div className="hidden sm:block overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="text-left text-xs uppercase tracking-wide bg-gray-50">
+                <tr>
+                  <th className="py-2 pr-3 font-semibold text-gray-700">Dato</th>
+                  <th className="py-2 pr-3 font-semibold text-gray-700">Start</th>
+                  <th className="py-2 pr-3 font-semibold text-gray-700">Slutt</th>
+                  <th className="py-2 pr-3 font-semibold text-gray-700">Pause</th>
+                  <th className="py-2 pr-3 font-semibold text-gray-700">Timer</th>
+                  <th className="py-2 pr-3 font-semibold text-gray-700">Handling</th>
+                </tr>
+              </thead>
+              <tbody>
+                {sortedShifts.map((shift) => {
+                  const hours = calcShiftHours(
+                    shift.startTime,
+                    shift.endTime,
+                    shift.breakMinutes
+                  );
+                  return (
+                    <tr key={shift.id} className="border-t">
+                      <td className="py-2 pr-3">{shift.date}</td>
+                      <td className="py-2 pr-3">{shift.startTime}</td>
+                      <td className="py-2 pr-3">{shift.endTime}</td>
+                      <td className="py-2 pr-3">{shift.breakMinutes} min</td>
+                      <td className="py-2 pr-3 font-medium">{hours.toFixed(2)}t</td>
+                      <td className="py-2 text-right">
+                        <button
+                          className="text-xs px-2 py-1 rounded border border-gray-300 bg-white hover:bg-gray-50 font-medium text-gray-700 transition-colors"
+                          onClick={() => onDelete(shift.id)}
+                          type="button"
+                          aria-label={`Fjern vakt fra ${shift.date}`}
+                        >
+                          Slett
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
     </div>
   );

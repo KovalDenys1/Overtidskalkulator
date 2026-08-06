@@ -108,6 +108,24 @@ export default function SummaryCard({
             </div>
           </div>
         )}
+        {(() => {
+          const daysWithOvertime = Object.entries(result.byDate)
+            .filter(([, d]) => d.dailyOvertime > 0)
+            .sort(([a], [b]) => a.localeCompare(b));
+          if (daysWithOvertime.length === 0) return null;
+          return (
+            <div className="space-y-1">
+              <div className="font-medium">Dager med overtid (over daglig grense):</div>
+              <div className="space-y-0.5">
+                {daysWithOvertime.map(([date, d]) => (
+                  <div key={date}>
+                    {date}: {d.hours}t ({d.dailyOvertime}t overtid)
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
       </div>
     </div>
   );

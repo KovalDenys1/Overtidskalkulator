@@ -86,7 +86,7 @@ export default function ProModalResolved({ isOpen, onClose, shifts, settings, re
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onClose}>
       <div className="rounded-2xl border bg-white p-6 shadow-lg max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
         <h2 className="text-lg font-semibold mb-2">Pro-funksjoner</h2>
-        <p className="text-sm opacity-80 mb-4">PDF- og CSV-rapporter, samt ubegrenset historikk, lanseres som abonnement.</p>
+        <p className="text-sm opacity-80 mb-4">PDF- og CSV-rapporter, samt ubegrenset historikk, lanseres som Pro-funksjoner.</p>
         <div className="rounded-xl border p-3 mb-4 bg-gray-50">
           <div className="text-sm font-medium mb-2">Pro inkluderer:</div>
           <ul className="text-sm opacity-80 space-y-1">
@@ -101,7 +101,7 @@ export default function ProModalResolved({ isOpen, onClose, shifts, settings, re
           <div className="space-y-4 mb-4">
             <div className="rounded-xl border p-4 bg-green-50 border-green-200 text-center">
               <div className="text-xl font-semibold text-green-800 mb-2">Takk!</div>
-              <div className="text-sm text-green-800 mb-2">Du er lagt til på ventelisten. Vi gir deg beskjed når Pro-abonnementet er klart.</div>
+              <div className="text-sm text-green-800 mb-2">Du er lagt til på ventelisten. Vi gir deg beskjed når Pro er klart.</div>
               <div className="text-xs text-green-700">Ingen spam. Kun én e-post.</div>
             </div>
             <button className="w-full rounded-xl border px-4 py-2 font-medium hover:bg-black/5" onClick={onClose} type="button">Lukk</button>
