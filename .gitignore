@@ -9,3 +9,4 @@ build/
 coverage/
 # Ignore OS files
 Thumbs.db
+.vercel
