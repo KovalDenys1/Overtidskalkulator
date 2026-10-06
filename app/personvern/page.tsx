@@ -25,15 +25,15 @@ export default function PersonvernPage() {
           <h3 className="text-lg font-semibold">Datainnsamling</h3>
           <p>
             Overtidskalkulator lagrer alle vakter, innstillinger og beregninger lokalt i nettleseren din (localStorage). 
-            Ingen data sendes til servere eller deles med tredjeparter.
+            Disse dataene sendes ikke til servere eller deles med tredjeparter.
           </p>
         </section>
 
         <section className="space-y-2">
           <h3 className="text-lg font-semibold">E-post (Venteliste)</h3>
           <p>
-            Hvis du oppgir e-post for å bli varslet om Pro-funksjoner, lagres denne lokalt på enheten din i MVP-fasen.
-            Ved lansering av betalingstjeneste vil e-postadresser kun brukes til å varsle om tilgjengelighet.
+            Hvis du oppgir e-post for å bli varslet om Pro-funksjoner, lagres e-postadressen og tidspunktet for påmeldingen
+            i en database hos Upstash (via Vercel) i Frankfurt, EU. Ingen andre opplysninger lagres sammen med den.
           </p>
           <p>
             <strong>Vi selger aldri personopplysninger.</strong> E-post brukes kun til å varsle deg om Pro-lansering. 
@@ -65,6 +65,7 @@ export default function PersonvernPage() {
           <p>
             Du har full kontroll over dataene dine. All data lagres lokalt i nettleseren, og du kan slette den når som helst 
             ved å tømme nettleserens lagring eller ved å bruke &quot;Tøm alle&quot;-funksjonen i kalkulatoren.
+            Vil du fjernes fra ventelisten, send en e-post til adressen under, så sletter vi e-postadressen din.
           </p>
         </section>
 

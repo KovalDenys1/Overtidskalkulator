@@ -44,40 +44,26 @@ export default function ProModalResolved({ isOpen, onClose, shifts, settings, re
     setErrorText("");
 
     const device = typeof window !== "undefined" ? (window.innerWidth < 768 ? "mobile" : "desktop") : "desktop";
-    const endpoint = process.env.NEXT_PUBLIC_FORMSPREE_WAITLIST_ENDPOINT;
+    try {
+      const res = await fetch("/api/waitlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({ email: emailValue }),
+      });
 
-    if (endpoint) {
-      try {
-        const res = await fetch(endpoint, {
-          method: "POST",
-          headers: { "Content-Type": "application/json", Accept: "application/json" },
-          body: JSON.stringify({ email: emailValue }),
-        });
-
-        if (res.ok) {
-          saveWaitlistEmail(emailValue);
-          incrementMetric("pro_send_count");
-          trackEvent("submit_email_waitlist", { source: "pro_modal", device });
-          setIsSuccess(true);
-        } else {
-          saveWaitlistEmail(emailValue);
-          incrementMetric("pro_send_count");
-          trackEvent("submit_email_waitlist_failed", { source: "pro_modal", device });
-          setErrorText("Kunne ikke sende akkurat nå. Prøv igjen senere.");
-        }
-      } catch {
+      if (res.ok) {
         saveWaitlistEmail(emailValue);
         incrementMetric("pro_send_count");
+        trackEvent("submit_email_waitlist", { source: "pro_modal", device });
+        setIsSuccess(true);
+      } else {
         trackEvent("submit_email_waitlist_failed", { source: "pro_modal", device });
         setErrorText("Kunne ikke sende akkurat nå. Prøv igjen senere.");
-      } finally {
-        setIsSubmitting(false);
       }
-    } else {
-      saveWaitlistEmail(emailValue);
-      incrementMetric("pro_send_count");
-      trackEvent("submit_email_waitlist_local_only", { source: "pro_modal", device });
-      setIsSuccess(true);
+    } catch {
+      trackEvent("submit_email_waitlist_failed", { source: "pro_modal", device });
+      setErrorText("Kunne ikke sende akkurat nå. Prøv igjen senere.");
+    } finally {
       setIsSubmitting(false);
     }
   };
