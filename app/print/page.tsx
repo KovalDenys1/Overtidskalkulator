@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import type { Shift, Settings, CalcResult } from "@/lib/types";
 import { calcShiftHours } from "@/lib/calc";
+import { formatDateShort, formatHours, formatKr, formatNumber, formatPercent, formatPeriod } from "@/lib/format";
 
 export default function PrintPage() {
   const [data, setData] = useState<{ shifts: Shift[]; settings: Settings; result: CalcResult } | null>(null);
@@ -38,9 +39,9 @@ export default function PrintPage() {
 
   if (hasError || !data) {
     return (
-      <div className="p-8 max-w-4xl mx-auto space-y-4">
+      <div className="mx-auto max-w-4xl space-y-4 py-8">
         <p>Ingen data å skrive ut.</p>
-        <Link href="/" className="text-blue-600 underline hover:opacity-80">
+        <Link href="/" className="font-medium text-accent underline">
           Tilbake til kalkulator
         </Link>
       </div>
@@ -53,11 +54,11 @@ export default function PrintPage() {
   const maxDate = sortedShifts[sortedShifts.length - 1]?.date || "";
 
   return (
-    <div className="p-8 max-w-4xl mx-auto">
+    <div className="mx-auto max-w-4xl py-8 print:py-0">
       <div className="mb-8 print:hidden">
         <button
           onClick={handlePrint}
-          className="rounded-xl border px-6 py-3 font-medium hover:bg-black/5"
+          className="press inline-flex min-h-12 items-center rounded-xl bg-accent px-5 font-semibold text-white hover:bg-accent-strong"
           type="button"
         >
           Skriv ut / Lagre som PDF
@@ -69,7 +70,7 @@ export default function PrintPage() {
           <h1 className="text-3xl font-bold mb-2">Overtidsrapport</h1>
           {minDate && maxDate && (
             <p className="text-lg opacity-70">
-              Periode: {minDate} - {maxDate}
+              Periode: {formatPeriod(minDate, maxDate)}
             </p>
           )}
         </div>
@@ -78,16 +79,16 @@ export default function PrintPage() {
           <div>
             <div className="font-semibold mb-1">Innstillinger</div>
             <div className="space-y-1 opacity-80">
-              <div>Timesats: {settings.hourlyRate} kr/time</div>
-              <div>Overtidstillegg: {((settings.overtimeMultiplier - 1) * 100).toFixed(0)}%</div>
-              <div>Grense per dag: {settings.dailyLimitHours} timer</div>
-              <div>Grense per uke: {settings.weeklyLimitHours} timer</div>
+              <div>Timelønn: {formatKr(settings.hourlyRate)}</div>
+              <div>Overtidstillegg: {formatPercent(settings.overtimeMultiplier)}</div>
+              <div>Overtid etter: {formatHours(settings.dailyLimitHours)} per dag</div>
+              <div>Overtid etter: {formatHours(settings.weeklyLimitHours)} per uke</div>
             </div>
           </div>
         </div>
 
         <div>
-          <table className="w-full border-collapse text-sm">
+          <table className="w-full border-collapse text-sm tabular-nums">
             <thead>
               <tr className="border-b-2 border-black">
                 <th className="text-left py-2 pr-4">Dato</th>
@@ -103,11 +104,11 @@ export default function PrintPage() {
 
                 return (
                   <tr key={shift.id} className="border-b">
-                    <td className="py-2 pr-4">{shift.date}</td>
+                    <td className="py-2 pr-4">{formatDateShort(shift.date)}</td>
                     <td className="py-2 pr-4">{shift.startTime}</td>
                     <td className="py-2 pr-4">{shift.endTime}</td>
                     <td className="py-2 pr-4">{shift.breakMinutes} min</td>
-                    <td className="py-2 text-right">{hours.toFixed(2)}</td>
+                    <td className="py-2 text-right">{formatNumber(hours)}</td>
                   </tr>
                 );
               })}
@@ -115,7 +116,7 @@ export default function PrintPage() {
                 <td colSpan={4} className="py-3 pr-4">
                   Totalt
                 </td>
-                <td className="py-3 text-right">{result.totalHours}</td>
+                <td className="py-3 text-right">{formatNumber(result.totalHours)}</td>
               </tr>
             </tbody>
           </table>
@@ -125,17 +126,17 @@ export default function PrintPage() {
           <div>
             <div className="font-semibold mb-2">Oppsummering</div>
             <div className="space-y-1 opacity-80">
-              <div>Totale timer: {result.totalHours}</div>
-              <div>Ordinære timer: {result.ordinaryHours}</div>
-              <div>Overtidstimer: {result.overtimeHours}</div>
+              <div>Totale timer: {formatHours(result.totalHours)}</div>
+              <div>Ordinære timer: {formatHours(result.ordinaryHours)}</div>
+              <div>Overtidstimer: {formatHours(result.overtimeHours)}</div>
             </div>
           </div>
           <div>
             <div className="font-semibold mb-2">Lønn</div>
             <div className="space-y-1 opacity-80">
-              <div>Grunnlønn: {result.basePay.toFixed(2)} kr</div>
-              <div>Overtidstillegg: {result.overtimeExtra.toFixed(2)} kr</div>
-              <div className="font-semibold opacity-100">Totalt: {result.totalPay.toFixed(2)} kr</div>
+              <div>Grunnlønn: {formatKr(result.basePay)}</div>
+              <div>Overtidstillegg: {formatKr(result.overtimeExtra)}</div>
+              <div className="font-semibold opacity-100">Totalt før skatt: {formatKr(result.totalPay)}</div>
             </div>
           </div>
         </div>

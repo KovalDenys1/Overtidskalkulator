@@ -1,17 +1,7 @@
 import type { Shift, Settings } from "./types";
 
-const SHIFTS_KEY = "overtid_shifts_v1";
-const SETTINGS_KEY = "overtid_settings_v1";
-const PRO_KEY = "overtid_pro_v1";
-const WAITLIST_KEY = "overtid_waitlist_v1";
-const METRICS_KEY = "overtid_metrics_v1";
-
-export type Metrics = {
-  pro_modal_open_count: number;
-  pro_send_count: number;
-  export_pdf_click_count: number;
-  export_csv_click_count: number;
-};
+export const SHIFTS_KEY = "overtid_shifts_v1";
+export const SETTINGS_KEY = "overtid_settings_v1";
 
 export const defaultSettings: Settings = {
   hourlyRate: 250,
@@ -25,7 +15,8 @@ export function loadShifts(): Shift[] {
   if (typeof window === "undefined") return [];
   try {
     const raw = localStorage.getItem(SHIFTS_KEY);
-    return raw ? (JSON.parse(raw) as Shift[]) : [];
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? (parsed as Shift[]) : [];
   } catch {
     return [];
   }
@@ -33,7 +24,11 @@ export function loadShifts(): Shift[] {
 
 export function saveShifts(shifts: Shift[]) {
   if (typeof window === "undefined") return;
-  localStorage.setItem(SHIFTS_KEY, JSON.stringify(shifts));
+  try {
+    localStorage.setItem(SHIFTS_KEY, JSON.stringify(shifts));
+  } catch {
+    // Private mode or full storage: the calculator still works for this visit.
+  }
 }
 
 export function loadSettings(): Settings {
@@ -48,102 +43,16 @@ export function loadSettings(): Settings {
 
 export function saveSettings(settings: Settings) {
   if (typeof window === "undefined") return;
-  localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
-}
-
-export function loadIsPro(): boolean {
-  if (typeof window === "undefined") return false;
   try {
-    const raw = localStorage.getItem(PRO_KEY);
-    return raw === "true";
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
   } catch {
-    return false;
+    // See saveShifts.
   }
 }
 
-export function saveIsPro(isPro: boolean) {
-  if (typeof window === "undefined") return;
-  localStorage.setItem(PRO_KEY, String(isPro));
-}
-
-export function saveWaitlistEmail(email: string) {
-  if (typeof window === "undefined") return;
-  const existing = loadWaitlistEmails();
-  if (!existing.includes(email)) {
-    existing.push(email);
-    localStorage.setItem(WAITLIST_KEY, JSON.stringify(existing));
-  }
-}
-
-export function loadWaitlistEmails(): string[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = localStorage.getItem(WAITLIST_KEY);
-    return raw ? (JSON.parse(raw) as string[]) : [];
-  } catch {
-    return [];
-  }
-}
-
-export function loadMetrics(): Metrics {
-  if (typeof window === "undefined")
-    return {
-      pro_modal_open_count: 0,
-      pro_send_count: 0,
-      export_pdf_click_count: 0,
-      export_csv_click_count: 0,
-    };
-  try {
-    const raw = localStorage.getItem(METRICS_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw) as Partial<Metrics>;
-      return {
-        pro_modal_open_count: parsed.pro_modal_open_count || 0,
-        pro_send_count: parsed.pro_send_count || 0,
-        export_pdf_click_count: parsed.export_pdf_click_count || 0,
-        export_csv_click_count: parsed.export_csv_click_count || 0,
-      };
-    }
-  } catch {
-    // Invalid data
-  }
-  return {
-    pro_modal_open_count: 0,
-    pro_send_count: 0,
-    export_pdf_click_count: 0,
-    export_csv_click_count: 0,
-  };
-}
-
-export function incrementMetric(key: keyof Metrics) {
-  if (typeof window === "undefined") return;
-  const metrics = loadMetrics();
-  metrics[key] = (metrics[key] || 0) + 1;
-  localStorage.setItem(METRICS_KEY, JSON.stringify(metrics));
-}
-
-// Helper function to export waitlist emails as CSV
-export function exportWaitlistToCSV() {
-  const emails = loadWaitlistEmails();
-  if (emails.length === 0) {
-    console.log("No emails in waitlist");
-    return;
-  }
-  
-  const csvContent = "email\n" + emails.join("\n");
-  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-  const link = document.createElement("a");
-  const url = URL.createObjectURL(blob);
-  link.setAttribute("href", url);
-  link.setAttribute("download", `waitlist_${new Date().toISOString().split("T")[0]}.csv`);
-  link.style.visibility = "hidden";
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  console.log(`Exported ${emails.length} emails to CSV`);
-}
-
-// Make it available globally for dev use
-if (typeof window !== "undefined") {
-  (window as any).exportWaitlistToCSV = exportWaitlistToCSV;
-}
+// Runs in <head> before first paint: marks the page when saved data will replace the server-rendered example.
+export const savedStateScript = `try{var s=localStorage.getItem(${JSON.stringify(SHIFTS_KEY)}),t=localStorage.getItem(${JSON.stringify(
+  SETTINGS_KEY
+)}),d=document.documentElement;if((s&&s!=="[]")||(t&&t!==${JSON.stringify(
+  JSON.stringify(defaultSettings)
+)})){d.classList.add("ot-saved");setTimeout(function(){d.classList.add("ot-reveal")},3000)}}catch(e){}`;

@@ -1,150 +1,233 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import type { Shift } from "@/lib/types";
 import { trackEvent } from "@/lib/analytics";
+import { calcShiftHours } from "@/lib/calc";
+import { formatHours, formatKr } from "@/lib/format";
+import NumberField from "./NumberField";
+import { ArrowUpIcon, CheckIcon, ChevronDownIcon, PlusIcon } from "./icons";
 
-const todayISO = () => new Date().toISOString().slice(0, 10);
+const HOURS = Array.from({ length: 24 }, (_, i) => i);
+const MINUTES = [0, 15, 30, 45];
+const pad = (n: number) => n.toString().padStart(2, "0");
+
+function todayISO() {
+  const d = new Date();
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
+function nextDayISO(iso: string) {
+  const next = new Date(`${iso}T12:00:00`);
+  next.setDate(next.getDate() + 1);
+  return `${next.getFullYear()}-${pad(next.getMonth() + 1)}-${pad(next.getDate())}`;
+}
 
 export default function ShiftForm({
   onAdd,
+  isExample,
+  totals,
 }: {
   onAdd: (shift: Omit<Shift, "id">) => void;
+  isExample: boolean;
+  totals: { hours: number; pay: number; count: number };
 }) {
-  const [date, setDate] = useState<string>(todayISO());
-  const [startTime, setStartTime] = useState("16:00");
-  const [endTime, setEndTime] = useState("22:00");
-  const [startHour, setStartHour] = useState<number>(16);
-  const [startMinute, setStartMinute] = useState<number>(0);
-  const [endHour, setEndHour] = useState<number>(22);
-  const [endMinute, setEndMinute] = useState<number>(0);
-  const [breakMinutes, setBreakMinutes] = useState<number>(30);
-  const [loading, setLoading] = useState(false);
+  const [date, setDate] = useState("");
+  const [startHour, setStartHour] = useState(8);
+  const [startMinute, setStartMinute] = useState(0);
+  const [endHour, setEndHour] = useState(16);
+  const [endMinute, setEndMinute] = useState(0);
+  const [breakMinutes, setBreakMinutes] = useState(30);
   const [justAdded, setJustAdded] = useState(false);
+  const reduceMotion = useReducedMotion();
+
+  useEffect(() => {
+    // Today's date only exists in the browser; the server render leaves the field empty.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setDate((d) => d || todayISO());
+  }, []);
+
+  useEffect(() => {
+    if (!justAdded) return;
+    const t = setTimeout(() => setJustAdded(false), 1400);
+    return () => clearTimeout(t);
+  }, [justAdded]);
+
+  const startTime = `${pad(startHour)}:${pad(startMinute)}`;
+  const endTime = `${pad(endHour)}:${pad(endMinute)}`;
+  const shiftHours = calcShiftHours(startTime, endTime, breakMinutes);
+  const overnight = endHour * 60 + endMinute <= startHour * 60 + startMinute;
+
+  const iconMotion = reduceMotion
+    ? { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 } }
+    : {
+        initial: { opacity: 0, scale: 0.25, filter: "blur(4px)" },
+        animate: { opacity: 1, scale: 1, filter: "blur(0px)" },
+        exit: { opacity: 0, scale: 0.25, filter: "blur(4px)" },
+      };
 
   return (
-    <form
-      className="w-full max-w-full rounded-2xl border p-4 shadow-sm space-y-3"
-      onSubmit={async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        const pad = (n: number) => n.toString().padStart(2, "0");
-        const s = `${pad(startHour)}:${pad(startMinute)}`;
-        const en = `${pad(endHour)}:${pad(endMinute)}`;
-        setStartTime(s);
-        setEndTime(en);
-        await Promise.resolve(onAdd({ date, startTime: s, endTime: en, breakMinutes }));
-        const device = typeof window !== "undefined" ? (window.innerWidth < 768 ? "mobile" : "desktop") : "desktop";
-        trackEvent("add_shift", { source: "main_form", device });
-        setLoading(false);
-        setJustAdded(true);
-        setTimeout(() => setJustAdded(false), 600);
-
-        // Advance to the next day: shifts are usually entered in a
-        // chronological run (a whole work week at a time), so this saves a
-        // manual date-picker interaction between each one.
-        const next = new Date(date + "T12:00:00");
-        next.setDate(next.getDate() + 1);
-        setDate(next.toISOString().slice(0, 10));
-      }}
+    <section
+      aria-labelledby="ny-vakt-tittel"
+      className="rounded-2xl border border-transparent bg-surface p-4 shadow-card sm:p-5"
     >
-      <h2 className="text-lg font-semibold">Legg til vakt</h2>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (!date) return;
+          onAdd({ date, startTime, endTime, breakMinutes });
+          trackEvent("add_shift", {
+            source: "main_form",
+            replacedExample: isExample,
+            device: window.innerWidth < 768 ? "mobile" : "desktop",
+          });
+          setJustAdded(true);
+          setDate(nextDayISO(date));
+        }}
+      >
+        <h2 id="ny-vakt-tittel" className="text-lg font-semibold leading-tight">
+          Legg til vakt
+        </h2>
 
-      <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2">
-        <label className="space-y-1 min-w-0 w-full block">
-          <div className="text-sm font-medium text-gray-700">Dato</div>
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            className="w-full max-w-full min-w-0 rounded-xl border px-3 py-3 min-h-12 appearance-none"
-            required
+        <div className="mt-4 grid grid-cols-2 gap-x-3 gap-y-4">
+          <div className="col-span-2 space-y-1.5">
+            <label htmlFor="vakt-dato" className="block text-sm font-medium text-ink">
+              Dato
+            </label>
+            <input
+              id="vakt-dato"
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="field appearance-none px-3"
+              required
+            />
+          </div>
+
+          <TimeFieldset
+            legend="Start"
+            hour={startHour}
+            minute={startMinute}
+            onHour={setStartHour}
+            onMinute={setStartMinute}
           />
-        </label>
+          <TimeFieldset legend="Slutt" hour={endHour} minute={endMinute} onHour={setEndHour} onMinute={setEndMinute} />
 
-        <div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 rounded-xl bg-gray-50 border border-gray-200">
-          <label className="space-y-1 min-w-0">
-            <div className="text-sm font-medium text-gray-700">Start</div>
-            <div className="flex gap-2">
-              <select
-                aria-label="Start hour"
-                value={startHour}
-                onChange={(e) => setStartHour(Number(e.target.value))}
-                className="w-1/2 max-w-full min-w-0 rounded-xl border px-3 py-3 appearance-none bg-white"
-              >
-                {Array.from({ length: 24 }).map((_, i) => (
-                  <option key={i} value={i}>
-                    {i.toString().padStart(2, "0")}
-                  </option>
-                ))}
-              </select>
-              <select
-                aria-label="Start minute"
-                value={startMinute}
-                onChange={(e) => setStartMinute(Number(e.target.value))}
-                className="w-1/2 max-w-full min-w-0 rounded-xl border px-3 py-3 appearance-none bg-white"
-              >
-                <option value={0}>00</option>
-                <option value={15}>15</option>
-                <option value={30}>30</option>
-                <option value={45}>45</option>
-              </select>
-            </div>
-          </label>
-
-          <label className="space-y-1 min-w-0">
-            <div className="text-sm font-medium text-gray-700">Slutt</div>
-            <div className="flex gap-2">
-              <select
-                aria-label="End hour"
-                value={endHour}
-                onChange={(e) => setEndHour(Number(e.target.value))}
-                className="w-1/2 max-w-full min-w-0 rounded-xl border px-3 py-3 appearance-none bg-white"
-              >
-                {Array.from({ length: 24 }).map((_, i) => (
-                  <option key={i} value={i}>
-                    {i.toString().padStart(2, "0")}
-                  </option>
-                ))}
-              </select>
-              <select
-                aria-label="End minute"
-                value={endMinute}
-                onChange={(e) => setEndMinute(Number(e.target.value))}
-                className="w-1/2 max-w-full min-w-0 rounded-xl border px-3 py-3 appearance-none bg-white"
-              >
-                <option value={0}>00</option>
-                <option value={15}>15</option>
-                <option value={30}>30</option>
-                <option value={45}>45</option>
-              </select>
-            </div>
-          </label>
+          <div className="col-span-2 space-y-1.5">
+            <label htmlFor="vakt-pause" className="block text-sm font-medium text-ink">
+              Ubetalt pause (minutter)
+            </label>
+            <NumberField
+              id="vakt-pause"
+              value={breakMinutes}
+              onValue={(n) => setBreakMinutes(Math.round(n))}
+              decimals={false}
+            />
+          </div>
         </div>
 
-        <label className="space-y-1 min-w-0">
-          <div className="text-sm font-medium text-gray-700">Pause (min)</div>
-          <input
-            type="number"
-            min={0}
-            value={breakMinutes}
-            onChange={(e) => {
-              const val = Number(e.target.value);
-              setBreakMinutes(isNaN(val) || val < 0 ? 0 : val);
-            }}
-            className="w-full max-w-full min-w-0 rounded-xl border px-3 py-3 min-h-12 appearance-none"
-          />
-          <div className="text-xs text-gray-600">Tid uten betaling (pauser/lunsj)</div>
-        </label>
-      </div>
+        <p className="mt-4 text-sm text-muted tabular-nums" aria-live="polite">
+          {overnight ? "Vakten går over midnatt og blir " : "Vakten blir "}
+          <strong className="font-semibold text-ink">{formatHours(shiftHours)}</strong> etter pause.
+        </p>
 
-      <button
-        className={`w-full max-w-full rounded-xl px-4 py-3.5 min-h-12 font-semibold transition-all disabled:opacity-60 disabled:cursor-not-allowed shadow-sm ${justAdded ? 'bg-green-600 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white'}`}
-        type="submit"
-        disabled={loading}
+        <button
+          type="submit"
+          className={`press mt-3 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl ps-4 pe-5 text-base font-semibold text-white ${
+            justAdded ? "bg-positive" : "bg-accent hover:bg-accent-strong"
+          }`}
+        >
+          <span className="grid size-5 place-items-center">
+            <AnimatePresence initial={false} mode="popLayout">
+              <motion.span
+                key={justAdded ? "added" : "add"}
+                {...iconMotion}
+                transition={{ type: "spring", duration: 0.3, bounce: 0 }}
+                className="[grid-area:1/1]"
+              >
+                {justAdded ? <CheckIcon className="size-5" /> : <PlusIcon className="size-5" />}
+              </motion.span>
+            </AnimatePresence>
+          </span>
+          {justAdded ? "Lagt til" : isExample ? "Legg til første vakt" : "Legg til vakt"}
+        </button>
+
+        <p role="status" className="sr-only">
+          {justAdded
+            ? `Vakten er lagt til. Totalt ${formatKr(totals.pay)} før skatt for ${formatHours(totals.hours)}.`
+            : ""}
+        </p>
+
+        {!isExample && totals.count > 0 && (
+          <a
+            href="#resultat"
+            className="mt-3 flex min-h-11 items-center justify-center gap-1.5 rounded-lg text-sm text-muted tabular-nums hover:text-ink lg:hidden"
+          >
+            <span>
+              Så langt: {formatHours(totals.hours)} · <strong className="font-semibold text-ink">{formatKr(totals.pay)}</strong>
+            </span>
+            <ArrowUpIcon className="size-3.5" />
+          </a>
+        )}
+      </form>
+    </section>
+  );
+}
+
+function TimeFieldset({
+  legend,
+  hour,
+  minute,
+  onHour,
+  onMinute,
+}: {
+  legend: string;
+  hour: number;
+  minute: number;
+  onHour: (n: number) => void;
+  onMinute: (n: number) => void;
+}) {
+  return (
+    <fieldset className="min-w-0 space-y-1.5">
+      <legend className="mb-1.5 text-sm font-medium text-ink">{legend}</legend>
+      <div className="flex items-center gap-1.5">
+        <Select label={`${legend}, time`} value={hour} onChange={onHour} options={HOURS} />
+        <span aria-hidden="true" className="font-semibold text-muted">
+          :
+        </span>
+        <Select label={`${legend}, minutt`} value={minute} onChange={onMinute} options={MINUTES} />
+      </div>
+    </fieldset>
+  );
+}
+
+function Select({
+  label,
+  value,
+  onChange,
+  options,
+}: {
+  label: string;
+  value: number;
+  onChange: (n: number) => void;
+  options: number[];
+}) {
+  return (
+    <div className="relative min-w-0 flex-1">
+      <select
+        aria-label={label}
+        value={value}
+        onChange={(e) => onChange(Number(e.target.value))}
+        className="field appearance-none ps-3 pe-8"
       >
-        {justAdded ? "✓ Lagt til" : loading ? "Legger til..." : "Legg til vakt"}
-      </button>
-    </form>
+        {options.map((o) => (
+          <option key={o} value={o}>
+            {pad(o)}
+          </option>
+        ))}
+      </select>
+      <ChevronDownIcon className="pointer-events-none absolute inset-y-0 end-2.5 my-auto size-4 text-muted" />
+    </div>
   );
 }

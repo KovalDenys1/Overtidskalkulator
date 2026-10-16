@@ -1,152 +1,202 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import type { CalcResult, Shift, Settings } from "@/lib/types";
-import { loadIsPro, incrementMetric } from "@/lib/storage";
 import { exportToPDF, exportToCSV } from "@/lib/export";
-import { trackExportPdfClicked, trackExportCsvClicked, trackEvent } from "@/lib/analytics";
-import ProModal from "./ProModalResolved";
+import { trackEvent } from "@/lib/analytics";
+import { formatHours, formatKr, formatPercent, formatPeriod, isoWeekLabel } from "@/lib/format";
+import AnimatedNumber from "./AnimatedNumber";
+import { DownloadIcon } from "./icons";
+
+function formatPlusKr(n: number) {
+  return `+${formatKr(n)}`;
+}
+
+function device() {
+  return typeof window !== "undefined" && window.innerWidth < 768 ? "mobile" : "desktop";
+}
 
 export default function SummaryCard({
   result,
   shifts,
   settings,
+  isExample,
+  animateNumbers,
+  onStartOwn,
 }: {
   result: CalcResult;
   shifts: Shift[];
   settings: Settings;
+  isExample: boolean;
+  animateNumbers: boolean;
+  onStartOwn: () => void;
 }) {
-  const [isPro, setIsPro] = useState(false);
-  const [showProModal, setShowProModal] = useState(false);
+  const hasShifts = shifts.length > 0;
+  const dates = shifts.map((s) => s.date).sort();
+  const period = hasShifts ? formatPeriod(dates[0], dates[dates.length - 1]) : "";
+  const weekLabel =
+    result.weekly.length === 1 ? isoWeekLabel(result.weekly[0].isoWeek) : `${result.weekly.length} uker`;
+  const instant = !animateNumbers;
 
-  useEffect(() => {
-    // See hooks/useShifts.ts for why this is setState-in-effect, not a lazy
-    // initializer: avoids an SSR/client hydration mismatch (no localStorage
-    // on the server).
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setIsPro(loadIsPro());
-  }, []);
-
-  const handlePDFClick = () => {
-    if (isPro) {
-      incrementMetric("export_pdf_click_count");
-      trackExportPdfClicked();
-      exportToPDF(shifts, settings, result);
-    } else {
-      const device = typeof window !== "undefined" ? (window.innerWidth < 768 ? "mobile" : "desktop") : "desktop";
-      trackEvent("open_pro_modal", { source: "summary_card", type: "pdf", device });
-      setShowProModal(true);
-    }
+  const handleExport = (kind: "pdf" | "csv") => {
+    trackEvent(kind === "pdf" ? "export_pdf_clicked" : "export_csv_clicked", {
+      source: "summary_card",
+      example: isExample,
+      device: device(),
+    });
+    if (kind === "pdf") exportToPDF(shifts, settings, result);
+    else exportToCSV(shifts, settings, result);
   };
 
-  const handleCSVClick = () => {
-    if (isPro) {
-      incrementMetric("export_csv_click_count");
-      trackExportCsvClicked();
-      exportToCSV(shifts, settings, result);
-    } else {
-      const device = typeof window !== "undefined" ? (window.innerWidth < 768 ? "mobile" : "desktop") : "desktop";
-      trackEvent("open_pro_modal", { source: "summary_card", type: "csv", device });
-      setShowProModal(true);
-    }
-  };
   return (
-    <div className="rounded-2xl border p-4 shadow-sm space-y-3">
-      <h2 className="text-lg font-semibold">Oppsummering</h2>
-
-      <div className="grid gap-3 sm:grid-cols-3">
-        <Stat label="Totale timer" value={`${result.totalHours}`} />
-        <Stat label="Ordinære timer" value={`${result.ordinaryHours}`} />
-        <Stat label="Overtidstimer" value={`${result.overtimeHours}`} />
+    <section
+      id="resultat"
+      aria-labelledby="resultat-tittel"
+      className="rounded-3xl border border-transparent bg-surface p-2 shadow-raised"
+    >
+      <div className="rounded-2xl bg-accent-soft px-4 pb-5 pt-4 sm:px-5">
+        <div className="flex items-baseline justify-between gap-3">
+          <h2 id="resultat-tittel" className="text-sm font-semibold text-accent-strong">
+            {isExample ? "Eksempel" : "Resultat"}
+          </h2>
+          {hasShifts && (
+            <p className="text-sm text-muted tabular-nums">
+              {weekLabel} · {period}
+            </p>
+          )}
+        </div>
+        <p className="mt-4 text-sm text-muted">Totalt før skatt</p>
+        <p className="mt-0.5 text-[2.5rem] font-semibold leading-[1.1] tracking-[-0.02em] tabular-nums sm:text-5xl">
+          <AnimatedNumber value={result.totalPay} format={formatKr} instant={instant} />
+        </p>
+        <p className="mt-2 text-sm text-ink">
+          Herav overtidstillegg{" "}
+          <strong className="font-semibold tabular-nums">
+            <AnimatedNumber value={result.overtimeExtra} format={formatPlusKr} instant={instant} />
+          </strong>
+        </p>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-3">
-        <Stat label="Grunnlønn" value={`${result.basePay} kr`} />
-        <Stat
-          label="Overtidstillegg"
-          value={`${result.overtimeExtra} kr`}
-          helperText="Ekstra betaling for overtid (40%/50%/100%)"
-        />
-        <div className="space-y-2">
-          <Stat label="Totalt (brutto)" value={`${result.totalPay} kr`} highlight />
+      {isExample && (
+        <div className="flex flex-col gap-3 px-3 pt-4 sm:flex-row sm:items-center sm:justify-between sm:px-4">
+          <p className="text-sm text-muted">
+            En uke med 45 timer og to lange dager. Den første vakten du legger inn, erstatter eksempelet.
+          </p>
           <button
-            className="w-full rounded-xl border px-3 py-2 font-medium hover:bg-black/5 text-sm"
-            onClick={handlePDFClick}
             type="button"
+            onClick={onStartOwn}
+            className="press inline-flex min-h-11 shrink-0 items-center justify-center rounded-xl bg-accent px-4 text-sm font-semibold text-white hover:bg-accent-strong"
           >
-            PDF-rapport (Pro – kommer snart)
-          </button>
-          <button
-            className="w-full rounded-xl border px-3 py-2 font-medium hover:bg-black/5 text-sm"
-            onClick={handleCSVClick}
-            type="button"
-          >
-            CSV-rapport (Pro – kommer snart)
+            Legg inn egne vakter
           </button>
         </div>
-      </div>
+      )}
 
-      <ProModal isOpen={showProModal} onClose={() => setShowProModal(false)} shifts={shifts} settings={settings} result={result} />
+      <div className="space-y-5 px-3 pb-3 pt-5 sm:px-4 sm:pb-4">
+        <dl className="grid grid-cols-3 gap-2">
+          <Stat label="Timer" value={result.totalHours} instant={instant} />
+          <Stat label="Ordinære" value={result.ordinaryHours} instant={instant} />
+          <Stat label="Overtid" value={result.overtimeHours} instant={instant} accent={result.overtimeHours > 0} />
+        </dl>
 
-      <div className="space-y-2 text-xs text-gray-700">
-        <div>
-          Daglig overtid (sum): <b>{result.dailyOvertimeSum}</b> t • Ukentlig overtid (sum): <b>{result.weeklyOvertimeSum}</b> t
-          <br />
-          <span className="text-gray-600">
-            Vi bruker største av daglig/ukentlig for å unngå dobbelttelling av samme timer.
-          </span>
-        </div>
-        {result.weekly.length > 0 && (
-          <div className="space-y-1">
-            <div className="font-medium">Uker:</div>
-            <div className="space-y-0.5">
+        <dl className="space-y-2.5 text-sm">
+          <Line
+            label="Grunnlønn"
+            detail={`${formatHours(result.totalHours)} × ${formatKr(settings.hourlyRate)}`}
+            value={result.basePay}
+            instant={instant}
+          />
+          <Line
+            label="Overtidstillegg"
+            detail={`${formatHours(result.overtimeHours)} × ${formatPercent(settings.overtimeMultiplier)}`}
+            value={result.overtimeExtra}
+            instant={instant}
+          />
+        </dl>
+
+        <div className="rounded-xl bg-canvas p-3 text-sm text-muted">
+          <h3 className="font-medium text-ink">Slik er overtiden regnet</h3>
+          <p className="mt-1">
+            {!hasShifts
+              ? "Legg inn en vakt, så ser du regnestykket her."
+              : result.overtimeHours === 0
+                ? `Ingen timer over ${formatHours(settings.dailyLimitHours)} per dag eller ${formatHours(settings.weeklyLimitHours)} per uke.`
+                : `Over ${formatHours(settings.dailyLimitHours)} per dag: ${formatHours(result.dailyOvertimeSum)}. Over ${formatHours(settings.weeklyLimitHours)} per uke: ${formatHours(result.weeklyOvertimeSum)}. Det høyeste tallet teller, så samme time ikke telles to ganger.`}
+          </p>
+          {result.weekly.length > 1 && (
+            <ul className="mt-2 space-y-0.5 tabular-nums">
               {result.weekly.map((w) => (
-                <div key={w.isoWeek}>
-                  {w.isoWeek}: {w.hours}t {w.overtime > 0 && <span>({w.overtime}t overtid)</span>}
-                </div>
+                <li key={w.isoWeek}>
+                  {isoWeekLabel(w.isoWeek)}: {formatHours(w.hours)}
+                  {w.overtime > 0 && `, ${formatHours(w.overtime)} over ukegrensen`}
+                </li>
               ))}
-            </div>
-          </div>
-        )}
-        {(() => {
-          const daysWithOvertime = Object.entries(result.byDate)
-            .filter(([, d]) => d.dailyOvertime > 0)
-            .sort(([a], [b]) => a.localeCompare(b));
-          if (daysWithOvertime.length === 0) return null;
-          return (
-            <div className="space-y-1">
-              <div className="font-medium">Dager med overtid (over daglig grense):</div>
-              <div className="space-y-0.5">
-                {daysWithOvertime.map(([date, d]) => (
-                  <div key={date}>
-                    {date}: {d.hours}t ({d.dailyOvertime}t overtid)
-                  </div>
-                ))}
-              </div>
-            </div>
-          );
-        })()}
+            </ul>
+          )}
+        </div>
+
+        <div className="grid grid-cols-2 gap-2">
+          <ExportButton disabled={!hasShifts} onClick={() => handleExport("pdf")} label="PDF-rapport" />
+          <ExportButton disabled={!hasShifts} onClick={() => handleExport("csv")} label="CSV-fil" />
+        </div>
+
+        <p className="text-xs leading-normal text-muted">
+          Brutto, før skatt. Veiledende beregning – arbeidsavtalen eller tariffavtalen din kan ha andre grenser og
+          satser.
+        </p>
       </div>
-    </div>
+    </section>
   );
 }
 
 function Stat({
   label,
   value,
-  helperText,
-  highlight,
+  instant,
+  accent = false,
 }: {
   label: string;
-  value: string;
-  helperText?: string;
-  highlight?: boolean;
+  value: number;
+  instant: boolean;
+  accent?: boolean;
 }) {
   return (
-    <div className={`rounded-xl border p-3 ${highlight ? "bg-blue-50 border-2 border-blue-400" : ""}`}>
-      <div className="text-xs font-medium text-gray-600">{label}</div>
-      <div className={`font-semibold ${highlight ? "text-xl" : "text-lg"}`}>{value}</div>
-      {helperText && <div className="text-xs text-gray-600 mt-1">{helperText}</div>}
+    <div className="rounded-xl bg-canvas px-3 py-2.5">
+      <dt className="text-xs font-medium text-muted">{label}</dt>
+      <dd
+        className={`mt-0.5 text-lg font-semibold tabular-nums transition-[color] duration-150 ease-out ${
+          accent ? "text-accent-strong" : "text-ink"
+        }`}
+      >
+        <AnimatedNumber value={value} format={formatHours} instant={instant} />
+      </dd>
     </div>
+  );
+}
+
+function Line({ label, detail, value, instant }: { label: string; detail: string; value: number; instant: boolean }) {
+  return (
+    <div className="flex items-baseline justify-between gap-4">
+      <dt className="min-w-0">
+        <span className="font-medium text-ink">{label}</span>{" "}
+        <span className="text-muted tabular-nums">{detail}</span>
+      </dt>
+      <dd className="shrink-0 font-semibold tabular-nums">
+        <AnimatedNumber value={value} format={formatKr} instant={instant} />
+      </dd>
+    </div>
+  );
+}
+
+function ExportButton({ label, onClick, disabled }: { label: string; onClick: () => void; disabled: boolean }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className="press inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-line bg-surface ps-3.5 pe-4 text-sm font-semibold text-ink hover:border-field hover:bg-canvas disabled:cursor-not-allowed disabled:opacity-50"
+    >
+      <DownloadIcon className="size-4 text-muted" />
+      {label}
+    </button>
   );
 }

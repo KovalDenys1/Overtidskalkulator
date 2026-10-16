@@ -1,9 +1,9 @@
-import Link from "next/link";
 import type { Metadata } from "next";
+import { ProsePage } from "@/components/ProsePage";
 
 export const metadata: Metadata = {
   title: "Om oss",
-  description: "Om Overtidskalkulator - en veiledende kalkulator for overtid i Norge.",
+  description: "Om Overtidskalkulator – en gratis, veiledende kalkulator for overtid og overtidstillegg i Norge.",
   alternates: {
     canonical: "/om",
   },
@@ -11,108 +11,75 @@ export const metadata: Metadata = {
 
 export default function OmPage() {
   return (
-    <main className="space-y-6 max-w-3xl">
-      <div>
-        <Link href="/" className="text-sm opacity-70 hover:opacity-100">
-          ← Tilbake
-        </Link>
-      </div>
-      
-      <h2 className="text-2xl sm:text-3xl font-bold">Om Overtidskalkulator</h2>
-      
-      <div className="space-y-4 text-sm">
-        <section className="space-y-2">
-          <h3 className="text-lg font-semibold">Hva er Overtidskalkulator?</h3>
-          <p>
-            Overtidskalkulator er et gratis verktøy laget for å hjelpe arbeidstakere i Norge med å beregne 
-            overtidstimer og estimert lønn basert på vakter de har jobbet.
-          </p>
-          <p>
-            Kalkulatoren tar hensyn til både daglig og ukentlig overtid, og bruker det høyeste antallet 
-            overtidstimer for å unngå dobbelttelling.
-          </p>
-        </section>
+    <ProsePage title="Om Overtidskalkulator" updated="16. oktober 2026">
+      <section>
+        <h2>Hva er Overtidskalkulator?</h2>
+        <p>
+          Overtidskalkulator er et gratis verktøy for arbeidstakere i Norge. Du legger inn vaktene dine og ser hvor
+          mange timer som er overtid, og hva de gir i kroner før skatt.
+        </p>
+        <p>
+          Kalkulatoren regner både daglig og ukentlig overtid, og bruker det høyeste tallet, så samme time ikke telles
+          to ganger.
+        </p>
+      </section>
 
-        <section className="space-y-2">
-          <h3 className="text-lg font-semibold">Veiledende kalkulator</h3>
-          <p>
-            <strong>Dette er en veiledende kalkulator.</strong> Beregningene er basert på generelle regler 
-            i norsk arbeidsmiljølov og vanlige arbeidsavtaler.
-          </p>
-          <p>
-            De faktiske reglene for overtid, timelønn og tillegg kan variere avhengig av:
-          </p>
-          <ul className="list-disc list-inside space-y-1 opacity-80">
-            <li>Din individuelle arbeidsavtale</li>
-            <li>Tariffavtaler i din bransje</li>
-            <li>Bedriftens interne retningslinjer</li>
-            <li>Spesielle bestemmelser for din stilling</li>
-          </ul>
-        </section>
+      <section>
+        <h2>Gratis, uten innlogging</h2>
+        <p>
+          Alt er gratis, også PDF-rapporten og CSV-filen du kan ta med til lønnsslippen eller arbeidsgiveren. Det finnes
+          ingen betalt versjon, og du trenger ingen konto.
+        </p>
+      </section>
 
-        <section className="space-y-2">
-          <h3 className="text-lg font-semibold">Arbeidsmiljøloven</h3>
-          <p>
-            Overtidskalkulator baserer seg på prinsipper fra{" "}
-            <a 
-              href="https://lovdata.no/dokument/NL/lov/2005-06-17-62" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="underline hover:opacity-70"
-            >
-              Arbeidsmiljøloven
-            </a>
-            , som regulerer arbeidsforhold i Norge. Loven setter blant annet krav om minimum 40% tillegg for overtidsarbeid.
-          </p>
-          <p className="opacity-80">
-            Merk: Dette verktøyet gir ikke juridisk rådgivning. For spesifikke juridiske spørsmål om dine 
-            rettigheter, anbefaler vi å kontakte fagforening, advokat eller Arbeidstilsynet.
-          </p>
-        </section>
+      <section>
+        <h2>Veiledende kalkulator</h2>
+        <p>
+          <strong>Dette er en veiledende kalkulator.</strong> Beregningene bygger på de generelle reglene i
+          arbeidsmiljøloven. De faktiske reglene for overtid, timelønn og tillegg kan variere med:
+        </p>
+        <ul>
+          <li>arbeidsavtalen din</li>
+          <li>tariffavtalen i bransjen din</li>
+          <li>bedriftens egne retningslinjer</li>
+          <li>særlige regler for stillingen din</li>
+        </ul>
+      </section>
 
-        <section className="space-y-2">
-          <h3 className="text-lg font-semibold">Hvordan bruker jeg kalkulatoren?</h3>
-          <ol className="list-decimal list-inside space-y-1 opacity-80">
-            <li>Legg inn vaktene dine med dato, start- og sluttid, samt pause</li>
-            <li>Juster innstillinger for timelønn, overtidstillegg og grenser</li>
-            <li>Se oppsummering av timer og estimert lønn</li>
-          </ol>
-          <p className="opacity-80">
-            All data lagres lokalt i nettleseren din og deles ikke med noen.
-          </p>
-        </section>
+      <section>
+        <h2>Arbeidsmiljøloven</h2>
+        <p>
+          Kalkulatoren bygger på{" "}
+          <a href="https://lovdata.no/dokument/NL/lov/2005-06-17-62" target="_blank" rel="noopener noreferrer">
+            arbeidsmiljøloven
+          </a>
+          . Loven setter grensen for alminnelig arbeidstid til 9 timer per døgn og 40 timer per uke, og krever minst
+          40 % tillegg for overtid.
+        </p>
+        <p>
+          Kalkulatoren gir ikke juridisk rådgivning. Har du spørsmål om rettighetene dine, kontakt tillitsvalgt,
+          fagforeningen din, en advokat eller Arbeidstilsynet.
+        </p>
+      </section>
 
-        <section className="space-y-2">
-          <h3 className="text-lg font-semibold">Pro-funksjoner (kommer snart)</h3>
-          <p>
-            Vi jobber med å lansere Pro-funksjoner som vil inkludere:
-          </p>
-          <ul className="list-disc list-inside space-y-1 opacity-80">
-            <li>PDF-rapporter</li>
-            <li>CSV-eksport for regneark</li>
-            <li>Ubegrenset historikk</li>
-          </ul>
-          <p>
-            Pris og betalingsmodell er ikke bestemt ennå og annonseres når tjenesten lanseres.
-          </p>
-        </section>
+      <section>
+        <h2>Slik bruker du kalkulatoren</h2>
+        <ol>
+          <li>Legg inn vaktene med dato, start, slutt og ubetalt pause.</li>
+          <li>Juster timelønn, overtidstillegg og grenser hvis avtalen din er annerledes.</li>
+          <li>Les av timer og lønn, og last ned rapporten hvis du trenger den.</li>
+        </ol>
+        <p>Vaktene lagres bare i nettleseren din og sendes ikke til oss.</p>
+      </section>
 
-        <section className="space-y-2">
-          <h3 className="text-lg font-semibold">Kontakt</h3>
-          <p>
-            For spørsmål, feil eller forslag, kontakt oss på:{" "}
-            <a href="mailto:kontakt@overtidskalkulator.no" className="underline hover:opacity-70">
-              kontakt@overtidskalkulator.no
-            </a>
-          </p>
-        </section>
-
-        <section className="space-y-2 pt-4 border-t">
-          <p className="opacity-70 text-xs">
-            Sist oppdatert: 8. januar 2026
-          </p>
-        </section>
-      </div>
-    </main>
+      <section>
+        <h2>For fagforeninger, arbeidsgivere og nettsteder</h2>
+        <p>
+          Dere kan gjerne lenke til kalkulatoren fra egne sider. Har dere innspill til beregningene eller vil samarbeide,
+          skriv til{" "}
+          <a href="mailto:kontakt@overtidskalkulator.no">kontakt@overtidskalkulator.no</a>.
+        </p>
+      </section>
+    </ProsePage>
   );
 }

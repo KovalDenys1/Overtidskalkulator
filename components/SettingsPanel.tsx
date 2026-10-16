@@ -1,6 +1,15 @@
 "use client";
 
 import type { Settings } from "@/lib/types";
+import { defaultSettings } from "@/lib/storage";
+import NumberField from "./NumberField";
+import { ChevronDownIcon, ResetIcon } from "./icons";
+
+const MULTIPLIERS = [
+  { value: 1.4, label: "40 % – lovens minimum" },
+  { value: 1.5, label: "50 %" },
+  { value: 2, label: "100 %" },
+];
 
 export default function SettingsPanel({
   settings,
@@ -11,73 +20,87 @@ export default function SettingsPanel({
   onChange: (patch: Partial<Settings>) => void;
   onReset: () => void;
 }) {
+  const isDefault =
+    settings.hourlyRate === defaultSettings.hourlyRate &&
+    settings.overtimeMultiplier === defaultSettings.overtimeMultiplier &&
+    settings.dailyLimitHours === defaultSettings.dailyLimitHours &&
+    settings.weeklyLimitHours === defaultSettings.weeklyLimitHours;
+
   return (
-    <div className="rounded-2xl border p-4 shadow-sm space-y-4">
-      <div className="flex items-center justify-between gap-3">
-        <h2 className="text-lg font-semibold">Innstillinger</h2>
+    <section
+      aria-labelledby="innstillinger-tittel"
+      className="rounded-2xl border border-transparent bg-surface p-4 shadow-card sm:p-5"
+    >
+      <div className="flex min-h-11 items-center justify-between gap-3">
+        <h2 id="innstillinger-tittel" className="text-lg font-semibold leading-tight">
+          Lønn og grenser
+        </h2>
         <button
-          className="text-sm px-3 py-1.5 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 font-medium text-gray-700 transition-colors"
-          onClick={onReset}
           type="button"
+          onClick={onReset}
+          disabled={isDefault}
+          className="press inline-flex min-h-11 items-center gap-1.5 rounded-xl ps-3 pe-3.5 text-sm font-semibold text-muted hover:bg-black/[0.04] hover:text-ink disabled:cursor-not-allowed disabled:opacity-40"
         >
-          ↺ Tilbakestill
+          <ResetIcon className="size-4" />
+          Tilbakestill
         </button>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2">
-        <label className="space-y-1">
-          <div className="text-sm font-medium text-gray-700">Timesats (kr/time)</div>
-          <input
-            type="number"
-            min={0}
-            value={settings.hourlyRate}
-            onChange={(e) => onChange({ hourlyRate: Number(e.target.value) || 0 })}
-            className="w-full rounded-xl border px-3 py-2"
-          />
-        </label>
+      <div className="mt-3 grid gap-x-3 gap-y-4 sm:grid-cols-2">
+        <Field id="timelonn" label="Timelønn (kr)">
+          <NumberField id="timelonn" value={settings.hourlyRate} onValue={(n) => onChange({ hourlyRate: n })} />
+        </Field>
 
-        <label className="space-y-1">
-          <div className="text-sm font-medium text-gray-700">Overtidstillegg</div>
-          <select
-            value={settings.overtimeMultiplier}
-            onChange={(e) => onChange({ overtimeMultiplier: Number(e.target.value) })}
-            className="w-full rounded-xl border px-3 py-2"
-          >
-            <option value={1.4}>+40% (1.4x)</option>
-            <option value={1.5}>+50% (1.5x)</option>
-            <option value={2.0}>+100% (2.0x)</option>
-          </select>
-          <div className="text-xs text-gray-600">Ekstra lønn per overtidstime</div>
-        </label>
+        <Field id="tillegg" label="Overtidstillegg">
+          <div className="relative">
+            <select
+              id="tillegg"
+              value={settings.overtimeMultiplier}
+              onChange={(e) => onChange({ overtimeMultiplier: Number(e.target.value) })}
+              className="field appearance-none ps-3 pe-9"
+            >
+              {MULTIPLIERS.map((m) => (
+                <option key={m.value} value={m.value}>
+                  {m.label}
+                </option>
+              ))}
+            </select>
+            <ChevronDownIcon className="pointer-events-none absolute inset-y-0 end-3 my-auto size-4 text-muted" />
+          </div>
+        </Field>
 
-        <label className="space-y-1">
-          <div className="text-sm font-medium text-gray-700">Grense per dag (timer)</div>
-          <input
-            type="number"
-            min={0}
-            step={0.5}
+        <Field id="dagsgrense" label="Overtid etter (timer per dag)">
+          <NumberField
+            id="dagsgrense"
             value={settings.dailyLimitHours}
-            onChange={(e) => onChange({ dailyLimitHours: Number(e.target.value) || 0 })}
-            className="w-full rounded-xl border px-3 py-2"
+            onValue={(n) => onChange({ dailyLimitHours: n })}
           />
-        </label>
+        </Field>
 
-        <label className="space-y-1">
-          <div className="text-sm font-medium text-gray-700">Grense per uke (timer)</div>
-          <input
-            type="number"
-            min={0}
-            step={0.5}
+        <Field id="ukegrense" label="Overtid etter (timer per uke)">
+          <NumberField
+            id="ukegrense"
             value={settings.weeklyLimitHours}
-            onChange={(e) => onChange({ weeklyLimitHours: Number(e.target.value) || 0 })}
-            className="w-full rounded-xl border px-3 py-2"
+            onValue={(n) => onChange({ weeklyLimitHours: n })}
           />
-        </label>
+        </Field>
       </div>
 
-      <p className="text-xs text-gray-600">
-        Standard er veiledende (ofte 9t/dag og 40t/uke), men kan variere etter avtale/tariff.
+      <p className="mt-4 text-sm text-muted">
+        Standardverdiene følger arbeidsmiljøloven: 9 timer per dag, 40 timer per uke og minst 40 % tillegg. Tariffavtalen
+        din kan ha lavere grenser eller høyere tillegg.
       </p>
+    </section>
+  );
+}
+
+function Field({ id, label, children }: { id: string; label: string; children: React.ReactNode }) {
+  return (
+    <div className="min-w-0 space-y-1.5">
+      <label htmlFor={id} className="block text-sm font-medium text-ink">
+        {label}
+      </label>
+      {children}
     </div>
   );
 }
